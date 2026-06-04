@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OAK Escala — Carvalhos da Justiça</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oak: #1a2e1a;
+    --oak-mid: #2d4a2d;
+    --oak-light: #3d6b3d;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5f0e8;
+    --cream-dark: #e8e0d0;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --white: #ffffff;
+    --danger: #c0392b;
+    --success: #27ae60;
+    --card-bg: rgba(255,255,255,0.95);
+    --shadow: 0 4px 24px rgba(26,46,26,0.12);
+    --shadow-lg: 0 12px 48px rgba(26,46,26,0.2);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--oak);
+    color: var(--cream);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-mark {
+    width: 44px; height: 44px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: var(--oak);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .logo-text h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--cream);
+  }
+  .logo-text p {
+    font-size: 11px;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-actions { margin-left: auto; display: flex; gap: 8px; }
+  .btn-header {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-vol { background: transparent; color: var(--cream); border: 1px solid rgba(255,255,255,0.3); }
+  .btn-vol:hover { background: rgba(255,255,255,0.1); }
+  .btn-ctrl { background: var(--gold); color: var(--oak); font-weight: 600; }
+  .btn-ctrl:hover { background: var(--gold-light); }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── HERO (login/select) ── */
+  #screen-home {
+    min-height: calc(100vh - 76px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: linear-gradient(160deg, var(--cream) 0%, #dde8d4 100%);
+  }
+  #screen-home.active { display: flex; }
+  .home-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 48px 40px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+  }
+  .home-card .cross {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+  .home-card h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: var(--oak);
+    margin-bottom: 8px;
+  }
+  .home-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+  .access-btns { display: flex; flex-direction: column; gap: 12px; }
+  .btn-access {
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all .2s;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .btn-access-vol {
+    background: var(--oak);
+    color: var(--cream);
+  }
+  .btn-access-vol:hover { background: var(--oak-mid); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-access-ctrl {
+    background: var(--gold);
+    color: var(--oak);
+  }
+  .btn-access-ctrl:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-icon { font-size: 20px; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+  .page-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: var(--oak);
+    margin-bottom: 4px;
+  }
+  .page-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    color: var(--oak);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cream-dark);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title-icon { font-size: 18px; }
+
+  /* ── FORMS ── */
+  .form-group { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--oak);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  input[type="text"], input[type="password"], select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color .2s;
+    outline: none;
+  }
+  input:focus, select:focus { border-color: var(--oak-light); }
+
+  /* ── FUNÇÕES CHECKBOXES ── */
+  .funcoes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .func-check {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+    background: var(--white);
+    user-select: none;
+  }
+  .func-check:hover { border-color: var(--oak-light); background: #f0f7f0; }
+  .func-check input[type="checkbox"] { accent-color: var(--oak); width: 16px; height: 16px; flex-shrink: 0; }
+  .func-check span { font-size: 13px; font-weight: 500; }
+  .func-check.checked { border-color: var(--oak); background: #e8f0e8; }
+
+  /* ── CALENDAR PICKER ── */
+  .cal-wrap { overflow-x: auto; }
+  .cal-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 4px;
+    min-width: 420px;
+  }
+  .cal-table th {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text-muted);
+    padding: 6px 4px;
+    text-align: center;
+  }
+  .cal-day {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all .15s;
+    background: var(--white);
+    vertical-align: middle;
+    position: relative;
+  }
+  .cal-day:hover:not(.cal-empty):not(.cal-past) { border-color: var(--oak-light); }
+  .cal-day.cal-empty { background: transparent; cursor: default; }
+  .cal-day.cal-past { color: #ccc; cursor: default; background: #fafafa; }
+  .cal-day.cal-sunday { background: #f0f4ff; }
+  .cal-day.cal-wednesday { background: #f4f0ff; }
+  .cal-day.cal-unavailable {
+    background: var(--danger) !important;
+    color: white !important;
+    border-color: var(--danger) !important;
+    font-weight: 700;
+  }
+  .day-label { display: block; font-size: 9px; color: var(--text-muted); line-height: 1; margin-top: 1px; }
+  .cal-day.cal-sunday .day-label { color: #7b8fc7; }
+  .cal-day.cal-wednesday .day-label { color: #9b7bc7; }
+  .cal-day.cal-unavailable .day-label { color: rgba(255,255,255,0.7); }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+  .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary { background: var(--oak); color: var(--cream); }
+  .btn-primary:hover { background: var(--oak-mid); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-gold { background: var(--gold); color: var(--oak); }
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-outline { background: transparent; color: var(--oak); border: 1.5px solid var(--oak); }
+  .btn-outline:hover { background: var(--oak); color: var(--cream); }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-sm { padding: 8px 16px; font-size: 13px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+
+  /* ── VOLUNTEER LIST ── */
+  .vol-list { display: flex; flex-direction: column; gap: 8px; }
+  .vol-item {
+    display: flex; align-items: center;
+    padding: 12px 16px;
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid var(--cream-dark);
+    cursor: pointer;
+    transition: all .15s;
+    gap: 12px;
+  }
+  .vol-item:hover { border-color: var(--oak-light); background: #f8fcf8; }
+  .vol-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--oak);
+    color: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .vol-name { font-weight: 600; font-size: 14px; }
+  .vol-funcs { font-size: 12px; color: var(--text-muted); }
+  .vol-badge-wrap { margin-left: auto; display: flex; gap: 6px; }
+  .badge {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-green { background: #e8f5e9; color: #2e7d32; }
+  .badge-orange { background: #fff3e0; color: #e65100; }
+
+  /* ── SCHEDULE OUTPUT ── */
+  .schedule-out {
+    background: var(--oak);
+    color: var(--cream);
+    border-radius: 16px;
+    padding: 28px;
+    margin-top: 20px;
+  }
+  .schedule-out h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    color: var(--gold);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .sched-section { margin-bottom: 24px; }
+  .sched-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+  }
+  .sched-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 8px;
+    align-items: baseline;
+  }
+  .sched-date {
+    font-weight: 600; font-size: 13px; color: var(--gold);
+    min-width: 90px;
+  }
+  .sched-func { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .sched-name { font-size: 13px; color: var(--cream); font-weight: 500; }
+  .sched-pill {
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    display: inline-flex; gap: 4px;
+  }
+  .sched-pill-label { color: rgba(255,255,255,0.5); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s;
+    max-width: 320px;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  /* ── MODAL ── */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal h3 { font-family: 'Cinzel', serif; font-size: 18px; color: var(--oak); margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ── LOADING ── */
+  .loading-wrap {
+    text-align: center; padding: 40px 20px;
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--cream-dark);
+    border-top-color: var(--oak);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: var(--text-muted); font-size: 14px; }
+
+  /* ── GRID LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text-muted); font-size: 13px;
+    cursor: pointer; margin-bottom: 20px;
+    background: none; border: none; font-family: 'DM Sans', sans-serif;
+  }
+  .back-btn:hover { color: var(--oak); }
+
+  /* ── MONTH NAV ── */
+  .month-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .month-nav button {
+    background: none; border: 1px solid var(--cream-dark);
+    border-radius: 8px; width: 34px; height: 34px;
+    cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .month-nav button:hover { background: var(--cream-dark); }
+  .month-label { font-weight: 600; font-size: 15px; color: var(--oak); }
+
+  /* ── INDISP TAGS ── */
+  .indisp-tags { display: flex; flex-wrap: wrap; gap: 6px; min-height: 36px; }
+  .indisp-tag {
+    background: var(--danger);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .indisp-tag button { background: none; border: none; color: white; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+
+  /* ── CTRL VOLUNTEER CARDS ── */
+  .vol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .vol-card {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .vol-card-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .vol-card-funcs { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .vol-card-indisp { font-size: 11px; color: var(--danger); }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid var(--cream-dark); }
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px; font-weight: 600;
+    border: none; background: none;
+    cursor: pointer; color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+  }
+  .tab.active { color: var(--oak); border-bottom-color: var(--oak); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .divider { height: 1px; background: var(--cream-dark); margin: 24px 0; }
+  .text-center { text-align: center; }
+  .mt-12 { margin-top: 12px; }
+  .mb-0 { margin-bottom: 0; }
+  .gap-8 { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-muted); font-size: 14px;
+  }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .selected-vol-info {
+    background: #e8f0e8;
+    border: 1px solid var(--oak-light);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .warning-box {
+    background: #fff8e1;
+    border: 1px solid #f9a825;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #e65100;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-mark">✝</div>
+    <div class="logo-text">
+      <h1>OAK Church Franca</h1>
+      <p>Carvalhos da Justiça · Escala</p>
+    </div>
+    <div class="header-actions" id="headerActions"></div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════
+     TELA: HOME
+     ═══════════════════════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="home-card">
+    <div class="cross">✝</div>
+    <h2>Escala de Voluntários</h2>
+    <p>Gerencie sua disponibilidade ou acesse o painel de controle para gerar as escalas do mês.</p>
+    <div class="access-btns">
+      <button class="btn-access btn-access-vol" onclick="showVolSelect()">
+        <span class="btn-icon">🙋</span>
+        <div style="text-align:left">
+          <div>Sou Voluntário</div>
+          <div style="font-size:11px;font-weight:400;opacity:.8">Informar indisponibilidade e funções</div>
+        </div>
+      </button>
+      <button class="btn-access btn-access-ctrl" onclick="showCtrlLogin()">
+        <span class="btn-icon">⚙️</span>
+        <div style="text-align:left">
+          <div>Acesso do Controlador</div>
+          <div style="font-size:11px;font-weight:400;opacity:.7">Gerenciar equipe e gerar escalas</div>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TELA: SELECIONAR VOLUNTÁRIO
+     ═══════════════════════════════════════════════════════ -->
+<div id="screen-vol-select" class="screen">
+  <div class="main-wrap">
+    <button class="back-btn" onclick="goHome()">← Voltar</button>
+    <div class="page-title">Área do Voluntário</div>
+    <div class="page-sub">Selecione seu nome para continuar</div>
+
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">🔍</span> Encontre seu nome</div>
+      <div class="form-group mb-0">
+        <input type="text" id="searchVol" placeholder="Digite seu nome..." oninput="filterVols()">
+      </div>
+    </div>
+
+    <div id="volListContainer" class="vol-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TELA: PAINEL DO VOLUNTÁRIO
+     ═══════════════════════════════════════════════════════ -->
+<div id="screen-vol-panel" class="screen">
+  <div class="main-wrap">
+    <button class="back-btn" onclick="showVolSelect()">← Trocar voluntário</button>
+
+    <div id="volPanelHeader"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tab-indisp', this)">📅 Indisponibilidade</button>
+      <button class="tab" onclick="switchTab('tab-funcoes', this)">🎛️ Minhas Funções</button>
+    </div>
+
+    <!-- TAB: INDISPONIBILIDADE -->
+    <div id="tab-indisp" class="tab-content active">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">📅</span> Dias que não posso ser escalado</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+          Clique nos dias em que você não está disponível. Apenas <strong>quartas</strong> e <strong>domingos</strong> serão usados na escala.
+        </p>
+
+        <div class="month-nav">
+          <button onclick="changeCalMonth(-1)">‹</button>
+          <span class="month-label" id="calMonthLabel"></span>
+          <button onclick="changeCalMonth(1)">›</button>
+        </div>
+
+        <div class="cal-wrap">
+          <table class="cal-table" id="calTable">
+            <thead>
+              <tr>
+                <th>Dom</th><th>Seg</th><th>Ter</th><th>Qua</th>
+                <th>Qui</th><th>Sex</th><th>Sáb</th>
+              </tr>
+            </thead>
+            <tbody id="calBody"></tbody>
+          </table>
+        </div>
+
+        <div class="legend mt-12">
+          <div class="legend-item"><div class="legend-dot" style="background:#f0f4ff;border:1px solid #c5cae9"></div>Domingo</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f4f0ff;border:1px solid #ce93d8"></div>Quarta</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>Indisponível</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="card-title" style="border-bottom:none;padding-bottom:0;margin-bottom:12px">
+          <span class="card-title-icon">🚫</span> Dias marcados como indisponível
+        </div>
+        <div class="indisp-tags" id="indispTags">
+          <span style="font-size:13px;color:var(--text-muted)">Nenhum dia marcado ainda</span>
+        </div>
+
+        <div style="margin-top:24px">
+          <button class="btn btn-primary" onclick="saveIndisp()">💾 Salvar Indisponibilidade</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: FUNÇÕES -->
+    <div id="tab-funcoes" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🎛️</span> Funções que sei executar</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+          Marque todas as funções que você sabe executar. Após um treinamento novo, atualize aqui!
+        </p>
+        <div class="funcoes-grid" id="funcoesList"></div>
+        <div style="margin-top:24px">
+          <button class="btn btn-primary" onclick="saveFuncoes()">💾 Salvar Funções</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TELA: LOGIN CONTROLADOR
+     ═══════════════════════════════════════════════════════ -->
+<div id="screen-ctrl-login" class="screen">
+  <div class="main-wrap" style="max-width:420px;margin:0 auto">
+    <button class="back-btn" onclick="goHome()">← Voltar</button>
+    <div class="card">
+      <div class="card-title"><span class="card-title-icon">🔐</span> Acesso do Controlador</div>
+      <div class="form-group">
+        <label>Senha de acesso</label>
+        <input type="password" id="ctrlPassword" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doCtrlLogin()">
+      </div>
+      <button class="btn btn-primary" onclick="doCtrlLogin()" style="width:100%">Entrar</button>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:16px;text-align:center">
+        Senha padrão: <strong>oak2026</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TELA: PAINEL DO CONTROLADOR
+     ═══════════════════════════════════════════════════════ -->
+<div id="screen-ctrl-panel" class="screen">
+  <div class="main-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <div class="page-title">Painel do Controlador</div>
+      <button class="btn btn-outline btn-sm" onclick="goHome()">Sair</button>
+    </div>
+    <div class="page-sub">Gerencie a equipe e gere escalas mensais com IA</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('ctab-equipe', this)">👥 Equipe</button>
+      <button class="tab" onclick="switchTab('ctab-gerar', this)">🗓️ Gerar Escala</button>
+      <button class="tab" onclick="switchTab('ctab-config', this)">⚙️ Configurações</button>
+    </div>
+
+    <!-- CTAB: EQUIPE -->
+    <div id="ctab-equipe" class="tab-content active">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:gap;gap:8px">
+        <div style="font-size:14px;color:var(--text-muted)" id="ctrlEquipeCount"></div>
+        <button class="btn btn-primary btn-sm" onclick="showAddVol()">+ Adicionar Voluntário</button>
+      </div>
+      <div class="vol-grid" id="ctrlVolGrid"></div>
+    </div>
+
+    <!-- CTAB: GERAR ESCALA -->
+    <div id="ctab-gerar" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🗓️</span> Gerar Escala Mensal</div>
+
+        <div class="two-col">
+          <div class="form-group">
+            <label>Mês</label>
+            <select id="genMes">
+              <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+              <option value="3">Março</option><option value="4">Abril</option>
+              <option value="5">Maio</option><option value="6">Junho</option>
+              <option value="7">Julho</option><option value="8">Agosto</option>
+              <option value="9">Setembro</option><option value="10">Outubro</option>
+              <option value="11">Novembro</option><option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ano</label>
+            <select id="genAno">
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Observações especiais (opcional)</label>
+          <input type="text" id="genObs" placeholder="Ex: Semana Santa sem culto na quarta dia 8...">
+        </div>
+
+        <button class="btn btn-gold" onclick="gerarEscala()" id="btnGerar">
+          ✨ Gerar Escala com IA
+        </button>
+      </div>
+
+      <div id="scheduleOutput"></div>
+    </div>
+
+    <!-- CTAB: CONFIG -->
+    <div id="ctab-config" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🔑</span> Chave da API Anthropic</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+          Necessária para gerar escalas com IA. A chave fica salva apenas neste navegador.
+        </p>
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-...">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Salvar Chave</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🔐</span> Alterar Senha do Controlador</div>
+        <div class="form-group">
+          <label>Nova senha</label>
+          <input type="password" id="newPassword" placeholder="Mínimo 4 caracteres">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="changePassword()">Alterar Senha</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">⚠️</span> Zona de Perigo</div>
+        <button class="btn btn-danger btn-sm" onclick="confirmClear()">Limpar todos os dados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TELA: ADICIONAR VOLUNTÁRIO
+     ═══════════════════════════════════════════════════════ -->
+<div id="screen-add-vol" class="screen">
+  <div class="main-wrap" style="max-width:600px;margin:0 auto">
+    <button class="back-btn" onclick="showCtrlPanel()">← Voltar ao painel</button>
+    <div class="page-title">Adicionar Voluntário</div>
+    <div class="page-sub">Cadastre um novo membro na equipe</div>
+
+    <div class="card">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="addVolName" placeholder="Nome do voluntário">
+      </div>
+      <div class="card-title" style="margin-bottom:16px"><span class="card-title-icon">🎛️</span> Funções</div>
+      <div class="funcoes-grid" id="addVolFuncoes"></div>
+      <div style="margin-top:24px;display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="saveNewVol()">💾 Cadastrar</button>
+        <button class="btn btn-outline" onclick="showCtrlPanel()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Confirmar</h3>
+    <p id="modalMsg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="modalConfirmBtn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// ESTADO DA APLICAÇÃO
+// ════════════════════════════════════════════════════════
+
+const FUNCOES_DISPONIVEIS = [
+  'PTZ 1', 'PTZ 2', 'Câmera Móvel', 'Corte (Live)',
+  'Mix Live (Mesa)', 'Projetor', 'Iluminação',
+  'Fotografia', 'Stories', 'Interação'
+];
+
+const FUNCOES_CULTO = {
+  quarta: ['PTZ 1', 'Corte (Live)', 'Projetor', 'Iluminação'],
+  domingo_manha: ['Projetor', 'Iluminação'],
+  domingo_noite: ['PTZ 1', 'PTZ 2', 'Câmera Móvel', 'Corte (Live)', 'Mix Live (Mesa)', 'Projetor', 'Iluminação', 'Fotografia', 'Stories', 'Interação']
+};
+
+// Voluntários padrão (base de dados inicial)
+const DEFAULT_VOLUNTARIOS = [
+  { nome: 'LAUAN', funcoes: ['PTZ 1', 'PTZ 2', 'Corte (Live)', 'Stories'] },
+  { nome: 'SARA', funcoes: ['PTZ 1', 'PTZ 2', 'Câmera Móvel', 'Corte (Live)', 'Projetor', 'Iluminação', 'Fotografia'] },
+  { nome: 'ALISON MATOS', funcoes: ['PTZ 1', 'PTZ 2', 'Corte (Live)', 'Interação'] },
+  { nome: 'ALISON PILOTO', funcoes: ['Mix Live (Mesa)'] },
+  { nome: 'ANTONIO', funcoes: ['PTZ 1', 'PTZ 2', 'Corte (Live)', 'Mix Live (Mesa)', 'Projetor', 'Iluminação', 'Interação'] },
+  { nome: 'DANIEL', funcoes: ['PTZ 1', 'PTZ 2', 'Corte (Live)', 'Projetor', 'Iluminação'] },
+  { nome: 'DUDA PORTELA', funcoes: ['Projetor', 'Iluminação'] },
+  { nome: 'FERNANDO', funcoes: ['PTZ 1', 'PTZ 2', 'Corte (Live)', 'Projetor', 'Iluminação'] },
+  { nome: 'GUILHERME', funcoes: ['PTZ 1', 'PTZ 2', 'Câmera Móvel'] },
+  { nome: 'ICARO', funcoes: ['Mix Live (Mesa)', 'Iluminação'] },
+  { nome: 'JOAO PEDRO', funcoes: ['Iluminação'] },
+  { nome: 'JULIA', funcoes: ['Stories'] },
+  { nome: 'LAIRA LAMARCA', funcoes: ['Projetor', 'Iluminação'] },
+  { nome: 'LUAN CRUZ', funcoes: ['Corte (Live)'] },
+  { nome: 'MARIA LAURA', funcoes: ['Câmera Móvel', 'Projetor', 'Fotografia'] },
+  { nome: 'MARINA', funcoes: ['Stories'] },
+  { nome: 'MAYSA', funcoes: ['Câmera Móvel', 'Projetor', 'Iluminação', 'Fotografia'] },
+  { nome: 'MIGUEL', funcoes: ['PTZ 1', 'PTZ 2', 'Câmera Móvel', 'Projetor', 'Iluminação'] },
+  { nome: 'NICOLLAS', funcoes: ['Projetor', 'Iluminação'] },
+  { nome: 'SAMUEL', funcoes: ['PTZ 1', 'PTZ 2', 'Câmera Móvel', 'Projetor', 'Iluminação'] },
+  { nome: 'SIMONE', funcoes: ['Fotografia'] },
+  { nome: 'ANTONELA', funcoes: ['PTZ 1', 'PTZ 2'] },
+  { nome: 'ANNA JULIA', funcoes: ['Stories'] },
+  { nome: 'VICTOR', funcoes: ['PTZ 1', 'PTZ 2', 'Projetor', 'Iluminação'] },
+];
+
+// ── STORAGE ──
+function getData() {
+  try {
+    return JSON.parse(localStorage.getItem('oak_data') || 'null') || initData();
+  } catch(e) { return initData(); }
+}
+function initData() {
+  const d = {
+    voluntarios: DEFAULT_VOLUNTARIOS.map(v => ({
+      ...v, indisponibilidade: {}
+    })),
+    password: 'oak2026',
+    apiKey: ''
+  };
+  saveData(d);
+  return d;
+}
+function saveData(d) {
+  localStorage.setItem('oak_data', JSON.stringify(d));
+}
+
+// ── STATE ──
+let currentVol = null;
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+// ════════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  updateHeader(id);
+  window.scrollTo(0, 0);
+}
+
+function updateHeader(screen) {
+  const el = document.getElementById('headerActions');
+  if (['screen-vol-panel','screen-vol-select'].includes(screen)) {
+    el.innerHTML = `<button class="btn-header btn-ctrl" onclick="showCtrlLogin()">⚙️ Controlador</button>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+function goHome() { showScreen('screen-home'); }
+function showCtrlPanel() { showScreen('screen-ctrl-panel'); renderCtrlPanel(); }
+function showCtrlLogin() { showScreen('screen-ctrl-login'); }
+function showVolSelect() {
+  showScreen('screen-vol-select');
+  renderVolList(getData().voluntarios);
+}
+function showAddVol() {
+  showScreen('screen-add-vol');
+  renderAddVolFuncoes();
+}
+
+// ════════════════════════════════════════════════════════
+// VOLUNTÁRIO — LISTA / SELEÇÃO
+// ════════════════════════════════════════════════════════
+function renderVolList(vols) {
+  const container = document.getElementById('volListContainer');
+  if (!vols.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🙁</div>Nenhum voluntário encontrado</div>';
+    return;
+  }
+  container.innerHTML = vols.map((v, i) => {
+    const dataAtual = getData();
+    const vi = dataAtual.voluntarios.findIndex(x => x.nome === v.nome);
+    const indisp = dataAtual.voluntarios[vi]?.indisponibilidade || {};
+    const totalIndisp = Object.values(indisp).flat().length;
+    const initials = v.nome.split(' ').slice(0,2).map(x=>x[0]).join('');
+    return `
+    <div class="vol-item" onclick="selectVol('${v.nome}')">
+      <div class="vol-avatar">${initials}</div>
+      <div>
+        <div class="vol-name">${v.nome}</div>
+        <div class="vol-funcs">${v.funcoes.join(', ') || 'Sem funções definidas'}</div>
+      </div>
+      <div class="vol-badge-wrap">
+        ${totalIndisp > 0 ? `<span class="badge badge-orange">${totalIndisp} indisp.</span>` : '<span class="badge badge-green">Disponível</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterVols() {
+  const q = document.getElementById('searchVol').value.toLowerCase();
+  const vols = getData().voluntarios.filter(v => v.nome.toLowerCase().includes(q));
+  renderVolList(vols);
+}
+
+function selectVol(nome) {
+  currentVol = nome;
+  showScreen('screen-vol-panel');
+  renderVolPanel();
+}
+
+// ════════════════════════════════════════════════════════
+// VOLUNTÁRIO — PAINEL
+// ════════════════════════════════════════════════════════
+function renderVolPanel() {
+  const d = getData();
+  const vol = d.voluntarios.find(v => v.nome === currentVol);
+  if (!vol) return;
+
+  const initials = vol.nome.split(' ').slice(0,2).map(x=>x[0]).join('');
+  document.getElementById('volPanelHeader').innerHTML = `
+    <div class="selected-vol-info">
+      <div class="vol-avatar" style="width:44px;height:44px;font-size:16px">${initials}</div>
+      <div>
+        <div style="font-weight:700;font-size:16px">${vol.nome}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${vol.funcoes.length} função(ões) · Edite suas informações abaixo</div>
+      </div>
+    </div>`;
+
+  // Init calendar month to next month
+  const now = new Date();
+  calYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+  calMonth = (now.getMonth() + 1) % 12;
+
+  renderCalendar();
+  renderFuncoesList(vol.funcoes);
+}
+
+// ── CALENDÁRIO ──
+function renderCalendar() {
+  const d = getData();
+  const vol = d.voluntarios.find(v => v.nome === currentVol);
+  const indisp = vol?.indisponibilidade || {};
+
+  const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('calMonthLabel').textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const monthKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const indispDays = indisp[monthKey] || [];
+
+  let html = '';
+  let dayCount = 1;
+  for (let week = 0; week < 6; week++) {
+    if (dayCount > daysInMonth) break;
+    html += '<tr>';
+    for (let dow = 0; dow < 7; dow++) {
+      if (week === 0 && dow < firstDay) {
+        html += '<td class="cal-day cal-empty"></td>';
+      } else if (dayCount > daysInMonth) {
+        html += '<td class="cal-day cal-empty"></td>';
+      } else {
+        const date = new Date(calYear, calMonth, dayCount);
+        const isPast = date < today;
+        const isSun = dow === 0;
+        const isWed = dow === 3;
+        const isUnavail = indispDays.includes(dayCount);
+        const isCulto = isSun || isWed;
+
+        let cls = 'cal-day';
+        if (isPast) cls += ' cal-past';
+        else if (isUnavail) cls += ' cal-unavailable';
+        else if (isSun) cls += ' cal-sunday';
+        else if (isWed) cls += ' cal-wednesday';
+
+        const label = isSun ? 'Dom' : isWed ? 'Qua' : '';
+        const onclick = (!isPast && isCulto) ? `onclick="toggleDay(${dayCount})"` : '';
+
+        html += `<td class="${cls}" ${onclick}>
+          ${dayCount}
+          ${label ? `<span class="day-label">${label}</span>` : ''}
+        </td>`;
+        dayCount++;
+      }
+    }
+    html += '</tr>';
+  }
+
+  document.getElementById('calBody').innerHTML = html;
+  renderIndispTags();
+}
+
+function changeCalMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function toggleDay(day) {
+  const d = getData();
+  const vi = d.voluntarios.findIndex(v => v.nome === currentVol);
+  if (vi === -1) return;
+  const monthKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  if (!d.voluntarios[vi].indisponibilidade) d.voluntarios[vi].indisponibilidade = {};
+  if (!d.voluntarios[vi].indisponibilidade[monthKey]) d.voluntarios[vi].indisponibilidade[monthKey] = [];
+
+  const arr = d.voluntarios[vi].indisponibilidade[monthKey];
+  const idx = arr.indexOf(day);
+  if (idx >= 0) arr.splice(idx, 1);
+  else arr.push(day);
+  arr.sort((a,b)=>a-b);
+
+  saveData(d);
+  renderCalendar();
+}
+
+function renderIndispTags() {
+  const d = getData();
+  const vol = d.voluntarios.find(v => v.nome === currentVol);
+  const indisp = vol?.indisponibilidade || {};
+  const monthKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const days = indisp[monthKey] || [];
+
+  const el = document.getElementById('indispTags');
+  if (!days.length) {
+    el.innerHTML = '<span style="font-size:13px;color:var(--text-muted)">Nenhum dia marcado neste mês</span>';
+    return;
+  }
+  const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  el.innerHTML = days.map(d => `
+    <span class="indisp-tag">
+      ${d}/${calMonth+1}
+      <button onclick="toggleDay(${d})">×</button>
+    </span>`).join('');
+}
+
+function saveIndisp() {
+  showToast('Indisponibilidade salva com sucesso! ✅', 'success');
+}
+
+// ── FUNÇÕES ──
+function renderFuncoesList(selectedFuncoes) {
+  document.getElementById('funcoesList').innerHTML = FUNCOES_DISPONIVEIS.map(f => {
+    const checked = selectedFuncoes.includes(f);
+    return `
+    <label class="func-check ${checked ? 'checked' : ''}" onclick="toggleFunc(this, '${f}')">
+      <input type="checkbox" ${checked ? 'checked' : ''} onclick="event.stopPropagation()">
+      <span>${f}</span>
+    </label>`;
+  }).join('');
+}
+
+function toggleFunc(el, func) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+}
+
+function saveFuncoes() {
+  const d = getData();
+  const vi = d.voluntarios.findIndex(v => v.nome === currentVol);
+  if (vi === -1) return;
+
+  const checks = document.querySelectorAll('#funcoesList .func-check input:checked');
+  d.voluntarios[vi].funcoes = Array.from(checks).map(c => c.closest('.func-check').querySelector('span').textContent);
+  saveData(d);
+  showToast('Funções atualizadas com sucesso! ✅', 'success');
+}
+
+// ════════════════════════════════════════════════════════
+// CONTROLADOR — LOGIN
+// ════════════════════════════════════════════════════════
+function doCtrlLogin() {
+  const pw = document.getElementById('ctrlPassword').value;
+  const d = getData();
+  if (pw === d.password) {
+    document.getElementById('ctrlPassword').value = '';
+    showCtrlPanel();
+  } else {
+    showToast('Senha incorreta', 'error');
+    document.getElementById('ctrlPassword').value = '';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// CONTROLADOR — PAINEL
+// ════════════════════════════════════════════════════════
+function renderCtrlPanel() {
+  const d = getData();
+
+  // Contagem
+  document.getElementById('ctrlEquipeCount').textContent =
+    `${d.voluntarios.length} voluntários cadastrados`;
+
+  // Grid de voluntários
+  document.getElementById('ctrlVolGrid').innerHTML = d.voluntarios.map((v, i) => {
+    const totalIndisp = Object.values(v.indisponibilidade || {}).flat().length;
+    return `
+    <div class="vol-card">
+      <div class="vol-card-name">${v.nome}</div>
+      <div class="vol-card-funcs">${v.funcoes.join(', ') || 'Sem funções'}</div>
+      ${totalIndisp > 0 ? `<div class="vol-card-indisp">⚠ ${totalIndisp} dia(s) indisponível</div>` : ''}
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <button class="btn btn-outline btn-sm" onclick="ctrlEditVol(${i})" style="font-size:12px">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="ctrlRemoveVol(${i})" style="font-size:12px">Remover</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // API key
+  const apiKey = d.apiKey || '';
+  document.getElementById('apiKeyInput').value = apiKey;
+
+  // Set default month to next month
+  const now = new Date();
+  const nextMonth = (now.getMonth() + 1) % 12 + 1;
+  document.getElementById('genMes').value = nextMonth === 0 ? 1 : nextMonth;
+}
+
+function ctrlRemoveVol(idx) {
+  openModal('Remover Voluntário', 'Tem certeza que deseja remover este voluntário?', () => {
+    const d = getData();
+    d.voluntarios.splice(idx, 1);
+    saveData(d);
+    renderCtrlPanel();
+    showToast('Voluntário removido', 'success');
+  });
+}
+
+function ctrlEditVol(idx) {
+  const d = getData();
+  const vol = d.voluntarios[idx];
+  currentVol = vol.nome;
+  selectVol(vol.nome);
+}
+
+// ── ADICIONAR VOLUNTÁRIO ──
+function renderAddVolFuncoes() {
+  document.getElementById('addVolFuncoes').innerHTML = FUNCOES_DISPONIVEIS.map(f => `
+    <label class="func-check" onclick="this.classList.toggle('checked');this.querySelector('input').checked=!this.querySelector('input').checked">
+      <input type="checkbox" onclick="event.stopPropagation()">
+      <span>${f}</span>
+    </label>`).join('');
+}
+
+function saveNewVol() {
+  const nome = document.getElementById('addVolName').value.trim().toUpperCase();
+  if (!nome) { showToast('Digite o nome do voluntário', 'error'); return; }
+
+  const checks = document.querySelectorAll('#addVolFuncoes .func-check input:checked');
+  const funcoes = Array.from(checks).map(c => c.closest('.func-check').querySelector('span').textContent);
+
+  const d = getData();
+  if (d.voluntarios.find(v => v.nome === nome)) {
+    showToast('Voluntário já cadastrado', 'error');
+    return;
+  }
+  d.voluntarios.push({ nome, funcoes, indisponibilidade: {} });
+  saveData(d);
+  showToast(`${nome} cadastrado com sucesso!`, 'success');
+  showCtrlPanel();
+}
+
+// ════════════════════════════════════════════════════════
+// CONFIGURAÇÕES
+// ════════════════════════════════════════════════════════
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const d = getData();
+  d.apiKey = key;
+  saveData(d);
+  showToast('Chave da API salva!', 'success');
+}
+
+function changePassword() {
+  const pw = document.getElementById('newPassword').value;
+  if (pw.length < 4) { showToast('Senha deve ter pelo menos 4 caracteres', 'error'); return; }
+  const d = getData();
+  d.password = pw;
+  saveData(d);
+  document.getElementById('newPassword').value = '';
+  showToast('Senha alterada com sucesso!', 'success');
+}
+
+function confirmClear() {
+  openModal('Limpar Dados', 'Isso irá apagar TODOS os voluntários e indisponibilidades. Esta ação não pode ser desfeita.', () => {
+    localStorage.removeItem('oak_data');
+    initData();
+    showToast('Dados resetados para o padrão', 'success');
+    renderCtrlPanel();
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// GERAR ESCALA (IA)
+// ════════════════════════════════════════════════════════
+function getCalendarDates(year, month) {
+  // month: 1-indexed
+  const quartas = [], domingos = [];
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month - 1, day);
+    const dow = date.getDay();
+    if (dow === 0) domingos.push(day);
+    if (dow === 3) quartas.push(day);
+  }
+  return { quartas, domingos };
+}
+
+async function gerarEscala() {
+  const d = getData();
+  const apiKey = d.apiKey;
+  if (!apiKey) {
+    showToast('Configure a chave da API primeiro (aba Configurações)', 'error');
+    return;
+  }
+
+  const mes = parseInt(document.getElementById('genMes').value);
+  const ano = parseInt(document.getElementById('genAno').value);
+  const obs = document.getElementById('genObs').value.trim();
+
+  const monthNames = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  const { quartas, domingos } = getCalendarDates(ano, mes);
+  const mesKey = `${ano}-${String(mes).padStart(2,'0')}`;
+
+  // Construir dados de indisponibilidade para o mês
+  const indispResumo = d.voluntarios.map(v => {
+    const diasIndisp = v.indisponibilidade?.[mesKey] || [];
+    // Calcular quais quartas/domingos estão bloqueados
+    const quartasBlock = quartas.filter(q => diasIndisp.includes(q));
+    const domingosBlock = domingos.filter(dom => diasIndisp.includes(dom));
+    return { nome: v.nome, funcoes: v.funcoes, quartasBlock, domingosBlock };
+  });
+
+  // Construir prompt
+  const prompt = buildPrompt(indispResumo, quartas, domingos, mes, ano, monthNames[mes], obs);
+
+  // Mostrar loading
+  const out = document.getElementById('scheduleOutput');
+  out.innerHTML = `
+    <div class="schedule-out">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-text">Gerando escala de ${monthNames[mes]} ${ano} com IA...</div>
+      </div>
+    </div>`;
+
+  document.getElementById('btnGerar').disabled = true;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error.message);
+
+    const text = data.content?.[0]?.text || '';
+    renderSchedule(text, monthNames[mes], ano);
+  } catch (err) {
+    out.innerHTML = `<div class="schedule-out" style="text-align:center;padding:40px">
+      <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+      <div style="color:var(--gold);font-size:15px;margin-bottom:8px">Erro ao gerar escala</div>
+      <div style="font-size:13px;opacity:.7">${err.message}</div>
+    </div>`;
+  } finally {
+    document.getElementById('btnGerar').disabled = false;
+  }
+}
+
+function buildPrompt(voluntarios, quartas, domingos, mes, ano, mesNome, obs) {
+  const pad = n => String(n).padStart(2,'0');
+
+  const volStr = voluntarios.map(v => {
+    const qb = v.quartasBlock.length ? `Quartas bloqueadas: ${v.quartasBlock.map(d=>`${pad(d)}/${pad(mes)}`).join(', ')}` : 'Quartas: todas disponíveis';
+    const db = v.domingosBlock.length ? `Domingos bloqueados: ${v.domingosBlock.map(d=>`${pad(d)}/${pad(mes)}`).join(', ')}` : 'Domingos: todos disponíveis';
+    return `- ${v.nome} | Funções: ${v.funcoes.join(', ')} | ${qb} | ${db}`;
+  }).join('\n');
+
+  const quartasStr = quartas.map(d=>`${pad(d)}/${pad(mes)}`).join(', ');
+  const domingosStr = domingos.map(d=>`${pad(d)}/${pad(mes)}`).join(', ');
+
+  return `Você é o responsável por montar a escala de voluntários de comunicação da OAK Church Franca — Carvalhos da Justiça.
+
+REGRAS DOS CULTOS:
+- Cultos de QUARTA: preencher PTZ 1, Corte (Live), Projetor, Iluminação
+- DOMINGO MANHÃ: preencher apenas Projetor e Iluminação
+- DOMINGO NOITE: preencher TODAS as funções (PTZ 1, PTZ 2, Câmera Móvel, Corte (Live), Mix Live (Mesa), Projetor, Iluminação, Fotografia, Stories, Interação)
+
+REGRAS DE DISTRIBUIÇÃO:
+- Respeite rigorosamente as indisponibilidades
+- Distribua os voluntariados de forma equilibrada (ninguém deve ficar sobrecarregado)
+- Uma mesma pessoa pode exercer múltiplas funções no mesmo culto se necessário
+- Se não houver disponível para uma função, indique com "⚠️ SEM COBERTURA"
+
+MÊS: ${mesNome} ${ano}
+QUARTAS: ${quartasStr}
+DOMINGOS: ${domingosStr}
+${obs ? `OBSERVAÇÕES ESPECIAIS: ${obs}` : ''}
+
+EQUIPE E DISPONIBILIDADE:
+${volStr}
+
+RETORNE APENAS o JSON da escala no seguinte formato EXATO (sem markdown, sem texto antes ou depois):
+{
+  "quartas": [
+    {"data": "DD/MM", "PTZ1": "NOME", "Corte": "NOME", "Projetor": "NOME", "Iluminacao": "NOME"}
+  ],
+  "domingos_manha": [
+    {"data": "DD/MM", "Projetor": "NOME", "Iluminacao": "NOME"}
+  ],
+  "domingos_noite": [
+    {"data": "DD/MM", "PTZ1": "NOME", "PTZ2": "NOME", "Camera": "NOME", "Corte": "NOME", "MixLive": "NOME", "Projetor": "NOME", "Iluminacao": "NOME", "Fotografia": "NOME", "Stories": "NOME", "Interacao": "NOME"}
+  ]
+}`;
+}
+
+function renderSchedule(text, mesNome, ano) {
+  const out = document.getElementById('scheduleOutput');
+  let data;
+  try {
+    const clean = text.replace(/```json|```/g,'').trim();
+    data = JSON.parse(clean);
+  } catch(e) {
+    // fallback: show raw
+    out.innerHTML = `<div class="schedule-out"><h3>Escala ${mesNome} ${ano}</h3><pre style="font-size:12px;white-space:pre-wrap;opacity:.85">${text}</pre></div>`;
+    return;
+  }
+
+  let html = `<div class="schedule-out">
+    <h3>✝ Escala ${mesNome} ${ano}</h3>`;
+
+  // Quartas
+  if (data.quartas?.length) {
+    html += `<div class="sched-section">
+      <div class="sched-section-title">🎛️ Quartas-feiras — PTZ 1 · Corte · Projetor · Iluminação</div>`;
+    data.quartas.forEach(r => {
+      html += `<div class="sched-row">
+        <span class="sched-date">Qua ${r.data}</span>
+        <span class="sched-pill"><span class="sched-pill-label">PTZ 1</span> ${r.PTZ1}</span>
+        <span class="sched-pill"><span class="sched-pill-label">Corte</span> ${r.Corte}</span>
+        <span class="sched-pill"><span class="sched-pill-label">Proj.</span> ${r.Projetor}</span>
+        <span class="sched-pill"><span class="sched-pill-label">Ilum.</span> ${r.Iluminacao}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // Domingos manhã
+  if (data.domingos_manha?.length) {
+    html += `<div class="sched-section">
+      <div class="sched-section-title">☀️ Domingos de Manhã — Projetor · Iluminação</div>`;
+    data.domingos_manha.forEach(r => {
+      html += `<div class="sched-row">
+        <span class="sched-date">Dom ${r.data}</span>
+        <span class="sched-pill"><span class="sched-pill-label">Proj.</span> ${r.Projetor}</span>
+        <span class="sched-pill"><span class="sched-pill-label">Ilum.</span> ${r.Iluminacao}</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // Domingos noite
+  if (data.domingos_noite?.length) {
+    html += `<div class="sched-section">
+      <div class="sched-section-title">🌙 Domingos à Noite — Escala Completa</div>`;
+    data.domingos_noite.forEach(r => {
+      html += `<div class="sched-row" style="margin-bottom:14px;align-items:flex-start;flex-direction:column;gap:6px">
+        <span class="sched-date" style="font-size:15px">Dom ${r.data}</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <span class="sched-pill"><span class="sched-pill-label">PTZ 1</span> ${r.PTZ1}</span>
+          <span class="sched-pill"><span class="sched-pill-label">PTZ 2</span> ${r.PTZ2}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Câmera</span> ${r.Camera}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Corte</span> ${r.Corte}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Mix Live</span> ${r.MixLive}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Proj.</span> ${r.Projetor}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Ilum.</span> ${r.Iluminacao}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Foto</span> ${r.Fotografia}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Stories</span> ${r.Stories}</span>
+          <span class="sched-pill"><span class="sched-pill-label">Interação</span> ${r.Interacao}</span>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  html += `<div style="margin-top:20px;text-align:center">
+    <button class="btn btn-gold btn-sm" onclick="copiarEscala()">📋 Copiar Escala</button>
+  </div>`;
+
+  html += '</div>';
+  out.innerHTML = html;
+  out._data = data;
+}
+
+function copiarEscala() {
+  const el = document.querySelector('.schedule-out');
+  if (!el) return;
+  // Pega o texto visível
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Escala copiada!', 'success'));
+}
+
+// ════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════
+function switchTab(tabId, btn) {
+  const parent = btn.closest('.main-wrap') || document.body;
+  const tabContents = parent.querySelectorAll('.tab-content');
+  tabContents.forEach(t => t.classList.remove('active'));
+  const tabs = btn.closest('.tabs').querySelectorAll('.tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function openModal(title, msg, onConfirm) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  document.getElementById('modalConfirmBtn').onclick = () => { onConfirm(); closeModal(); };
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('open');
+}
+
+// Init
+getData();
+</script>
+</body>
+</html>
