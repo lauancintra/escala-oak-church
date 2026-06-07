@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OAK Escala — Carvalhos da Justiça</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ── CONFIGURAÇÃO FIREBASE ──
+  // Substitua com suas credenciais do Firebase Console
+  const firebaseConfig = {
+    apiKey: "AIzaSyDEuez90toWBDsYegerihaJmvXvDrdTZQQ",
+    authDomain: "escala-comunicacao-oak.firebaseapp.com",
+    projectId: "escala-comunicacao-oak",
+    storageBucket: "escala-comunicacao-oak.firebasestorage.app",
+    messagingSenderId: "495672494020",
+    appId: "1:495672494020:web:f4d0545721515a267b0691"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Expõe para o JS global
+  window._db = db;
+  window._fbFns = { doc, getDoc, setDoc, collection, getDocs, updateDoc, deleteDoc };
+  window._firebaseReady = true;
+  // Aguarda load completo antes de sinalizar — corrige GitHub Pages
+  window.addEventListener('load', () => {
+    setTimeout(() => document.dispatchEvent(new Event('firebaseReady')), 200);
+  });
+</script>
+
+<style>
+/* ════════════════════════════════════════════════
+   PALETA OAK CHURCH — Preto · Branco · Verde Oliva
+   ════════════════════════════════════════════════ */
+:root {
+  --black:       #0d0d0d;
+  --black-soft:  #1a1a1a;
+  --black-card:  #141414;
+  --grey-dark:   #2a2a2a;
+  --grey-mid:    #3d3d3d;
+  --grey-border: #2e2e2e;
+  --grey-muted:  #888;
+  --white:       #ffffff;
+  --off-white:   #f0ede8;
+  --olive:       #5a6e3a;
+  --olive-mid:   #6b8245;
+  --olive-light: #8aaa5c;
+  --olive-pale:  #c8d9a8;
+  --olive-bg:    rgba(90,110,58,0.12);
+  --danger:      #d94040;
+  --success:     #4caf72;
+  --warn:        #c99a2e;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  --radius-sm: 6px;
+  --radius:    12px;
+  --radius-lg: 18px;
+  --shadow:    0 4px 20px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--black);
+  color: var(--white);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--black-soft); }
+::-webkit-scrollbar-thumb { background: var(--grey-mid); border-radius: 3px; }
+
+/* ══════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════ */
+header {
+  background: var(--black-card);
+  border-bottom: 1px solid var(--grey-border);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.logo-wrap {
+  display: flex; align-items: center; gap: 12px;
+  text-decoration: none;
+}
+.logo-emblem {
+  width: 40px; height: 40px;
+  border: 2px solid var(--olive);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-emblem svg { width: 20px; height: 20px; fill: var(--olive); }
+.logo-text-wrap h1 {
+  font-family: var(--font-display);
+  font-size: 20px; letter-spacing: 2px;
+  color: var(--white); line-height: 1;
+}
+.logo-text-wrap span {
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--olive-light);
+}
+.header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.hdr-user {
+  font-size: 13px; color: var(--grey-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.hdr-user strong { color: var(--off-white); }
+
+/* ══════════════════════════════════════
+   SCREENS
+   ══════════════════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; }
+#screen-home { display: none; align-items: center; justify-content: center; min-height: calc(100vh - 69px); }
+#screen-home.active { display: flex; }
+
+/* ══════════════════════════════════════
+   HOME
+   ══════════════════════════════════════ */
+.home-wrap {
+  width: 100%; max-width: 440px;
+  padding: 24px;
+}
+.home-hero {
+  text-align: center; margin-bottom: 40px;
+}
+.home-hero .oak-cross {
+  width: 64px; height: 64px;
+  border: 2px solid var(--olive);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.home-hero .oak-cross svg { width: 32px; height: 32px; fill: var(--olive); }
+.home-hero h2 {
+  font-family: var(--font-display);
+  font-size: 36px; letter-spacing: 3px;
+  color: var(--white); line-height: 1;
+  margin-bottom: 8px;
+}
+.home-hero p { font-size: 14px; color: var(--grey-muted); }
+
+.access-card {
+  background: var(--black-card);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  margin-bottom: 12px;
+}
+.access-btn {
+  width: 100%; padding: 18px 20px;
+  border-radius: var(--radius);
+  border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 15px; font-weight: 600;
+  transition: all .2s;
+  display: flex; align-items: center; gap: 14px;
+  text-align: left; color: var(--white);
+  background: transparent;
+}
+.access-btn:hover { background: var(--grey-dark); }
+.access-btn .ab-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.ab-vol .ab-icon { background: var(--olive-bg); border: 1px solid var(--olive); }
+.ab-ctrl .ab-icon { background: rgba(255,255,255,0.05); border: 1px solid var(--grey-mid); }
+.access-btn .ab-label { font-size: 15px; font-weight: 600; color: var(--white); }
+.access-btn .ab-sub { font-size: 12px; font-weight: 400; color: var(--grey-muted); margin-top: 2px; }
+
+/* ══════════════════════════════════════
+   LOGIN — VOLUNTÁRIO
+   ══════════════════════════════════════ */
+.login-wrap {
+  max-width: 420px; margin: 0 auto; padding: 40px 24px;
+}
+
+/* ══════════════════════════════════════
+   LAYOUT GERAL
+   ══════════════════════════════════════ */
+.main-wrap {
+  max-width: 1100px; margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+.page-header { margin-bottom: 28px; }
+.page-title {
+  font-family: var(--font-display);
+  font-size: 28px; letter-spacing: 2px;
+  color: var(--white); line-height: 1;
+  margin-bottom: 4px;
+}
+.page-sub { font-size: 13px; color: var(--grey-muted); }
+
+/* ══════════════════════════════════════
+   CARDS
+   ══════════════════════════════════════ */
+.card {
+  background: var(--black-card);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-lg);
+  padding: 28px; margin-bottom: 16px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 16px; letter-spacing: 1.5px;
+  color: var(--white);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--grey-border);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-title-icon { font-size: 18px; }
+
+/* ══════════════════════════════════════
+   FORMS
+   ══════════════════════════════════════ */
+.form-group { margin-bottom: 18px; }
+label {
+  display: block; font-size: 11px; font-weight: 600;
+  color: var(--grey-muted); text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 8px;
+}
+input[type="text"], input[type="password"], input[type="number"], select, textarea {
+  width: 100%; padding: 12px 16px;
+  background: var(--grey-dark);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 14px;
+  color: var(--white); outline: none;
+  transition: border-color .2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--olive); }
+select option { background: var(--grey-dark); }
+
+/* ══════════════════════════════════════
+   BOTÕES
+   ══════════════════════════════════════ */
+.btn {
+  padding: 11px 22px; border-radius: var(--radius-sm);
+  border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  transition: all .18s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--olive); color: var(--white); }
+.btn-primary:hover { background: var(--olive-mid); transform: translateY(-1px); }
+.btn-white { background: var(--white); color: var(--black); }
+.btn-white:hover { background: var(--off-white); }
+.btn-outline { background: transparent; color: var(--white); border: 1px solid var(--grey-mid); }
+.btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,0.05); }
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-danger:hover { background: #c03535; }
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+.btn-xs { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ══════════════════════════════════════
+   TABS
+   ══════════════════════════════════════ */
+.tabs {
+  display: flex; gap: 2px; margin-bottom: 24px;
+  border-bottom: 1px solid var(--grey-border);
+}
+.tab {
+  padding: 10px 18px; font-size: 13px; font-weight: 600;
+  border: none; background: none; cursor: pointer;
+  color: var(--grey-muted); font-family: var(--font-body);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all .15s;
+}
+.tab.active { color: var(--olive-light); border-bottom-color: var(--olive); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ══════════════════════════════════════
+   FUNÇÕES CHECKBOXES
+   ══════════════════════════════════════ */
+.funcoes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 8px;
+}
+.func-check {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer; transition: all .15s;
+  background: var(--grey-dark); user-select: none;
+}
+.func-check:hover { border-color: var(--olive); }
+.func-check input[type="checkbox"] { accent-color: var(--olive); width: 15px; height: 15px; flex-shrink: 0; }
+.func-check span { font-size: 13px; font-weight: 500; }
+.func-check.checked { border-color: var(--olive); background: var(--olive-bg); }
+
+/* ══════════════════════════════════════
+   CALENDÁRIO
+   ══════════════════════════════════════ */
+.cal-outer { overflow-x: auto; }
+.month-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.month-nav button {
+  background: var(--grey-dark); border: 1px solid var(--grey-border);
+  border-radius: var(--radius-sm); width: 32px; height: 32px;
+  cursor: pointer; color: var(--white); font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.month-nav button:hover { border-color: var(--olive); color: var(--olive-light); }
+.month-label {
+  font-family: var(--font-display);
+  font-size: 18px; letter-spacing: 2px; color: var(--white);
+}
+.cal-table {
+  width: 100%; border-collapse: separate; border-spacing: 4px;
+  min-width: 380px;
+}
+.cal-table th {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--grey-muted);
+  padding: 6px 4px; text-align: center;
+}
+.cal-day {
+  width: 44px; height: 48px; border-radius: var(--radius-sm);
+  text-align: center; font-size: 13px; font-weight: 500;
+  cursor: default; border: 1px solid transparent;
+  transition: all .15s; background: var(--grey-dark);
+  vertical-align: middle; position: relative;
+  color: var(--grey-muted);
+}
+.cal-day.cal-empty { background: transparent; border-color: transparent; }
+.cal-day.cal-past { color: #444; background: #111; }
+.cal-day.cal-sunday {
+  background: var(--black-soft); color: var(--off-white);
+  border-color: var(--grey-border); cursor: pointer;
+}
+.cal-day.cal-wednesday {
+  background: var(--black-soft); color: var(--off-white);
+  border-color: var(--grey-border); cursor: pointer;
+}
+.cal-day.cal-sunday:hover:not(.cal-past),
+.cal-day.cal-wednesday:hover:not(.cal-past) {
+  border-color: var(--olive);
+}
+.cal-day.cal-unavail-full {
+  background: var(--danger) !important;
+  color: var(--white) !important;
+  border-color: var(--danger) !important;
+  cursor: pointer;
+}
+.cal-day.cal-unavail-manha {
+  background: linear-gradient(180deg, #c9852a 50%, var(--black-soft) 50%) !important;
+  color: var(--white) !important;
+  border-color: #c9852a !important;
+  cursor: pointer;
+}
+.cal-day.cal-unavail-noite {
+  background: linear-gradient(180deg, var(--black-soft) 50%, #5a3ab5 50%) !important;
+  color: var(--white) !important;
+  border-color: #5a3ab5 !important;
+  cursor: pointer;
+}
+.day-num { display: block; line-height: 1.2; font-size: 14px; }
+.day-label {
+  display: block; font-size: 9px; line-height: 1;
+  opacity: .7; letter-spacing: .5px; text-transform: uppercase;
+  margin-top: 2px;
+}
+.day-indisp-indicator {
+  display: block; font-size: 8px; line-height: 1; margin-top: 2px;
+  opacity: .9;
+}
+
+/* ── LEGEND ── */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--grey-muted); }
+.ld { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+/* ── PERÍODO PICKER (popup ao clicar no domingo) ── */
+.periodo-popup {
+  position: fixed; z-index: 500;
+  background: var(--black-card);
+  border: 1px solid var(--olive);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  display: none;
+}
+.periodo-popup.open { display: block; }
+.periodo-popup h4 {
+  font-size: 12px; font-weight: 600;
+  color: var(--grey-muted); text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 10px;
+}
+.periodo-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all .15s; margin-bottom: 4px;
+  border: 1px solid var(--grey-border);
+  font-size: 13px; font-weight: 500;
+  background: var(--grey-dark);
+}
+.periodo-option:hover { border-color: var(--olive); background: var(--olive-bg); }
+.periodo-option.selected { border-color: var(--olive); background: var(--olive-bg); color: var(--olive-light); }
+.periodo-clear {
+  margin-top: 8px; width: 100%; padding: 8px;
+  background: transparent; border: 1px solid var(--grey-border);
+  color: var(--grey-muted); border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 12px;
+  font-family: var(--font-body); transition: all .15s;
+}
+.periodo-clear:hover { border-color: var(--danger); color: var(--danger); }
+
+/* ── TAGS INDISPONIBILIDADE ── */
+.indisp-tags { display: flex; flex-wrap: wrap; gap: 6px; min-height: 32px; }
+.itag {
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 5px;
+}
+.itag-full { background: rgba(217,64,64,0.2); color: #ff7070; border: 1px solid rgba(217,64,64,0.4); }
+.itag-manha { background: rgba(201,154,46,0.2); color: #e8bb5a; border: 1px solid rgba(201,154,46,0.4); }
+.itag-noite { background: rgba(90,58,181,0.2); color: #a08de8; border: 1px solid rgba(90,58,181,0.4); }
+.itag button { background: none; border: none; cursor: pointer; color: inherit; font-size: 14px; line-height: 1; padding: 0 0 0 2px; opacity: .7; }
+.itag button:hover { opacity: 1; }
+
+/* ══════════════════════════════════════
+   VOLUNTÁRIO — LISTA / SELEÇÃO
+   ══════════════════════════════════════ */
+.vol-list { display: flex; flex-direction: column; gap: 6px; }
+.vol-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--black-card);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius);
+  cursor: pointer; transition: all .15s;
+}
+.vol-item:hover { border-color: var(--olive); background: var(--olive-bg); }
+.vol-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--olive); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
+  letter-spacing: .5px;
+}
+.vol-name { font-weight: 600; font-size: 14px; }
+.vol-funcs { font-size: 12px; color: var(--grey-muted); margin-top: 2px; }
+.vol-badge-wrap { margin-left: auto; }
+.badge {
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-ok { background: rgba(76,175,114,0.2); color: #6fcf97; border: 1px solid rgba(76,175,114,0.3); }
+.badge-warn { background: rgba(201,154,46,0.2); color: #e8bb5a; border: 1px solid rgba(201,154,46,0.3); }
+
+/* ══════════════════════════════════════
+   PAINEL INFO DO VOLUNTÁRIO
+   ══════════════════════════════════════ */
+.vol-panel-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 20px;
+  background: var(--olive-bg);
+  border: 1px solid var(--olive);
+  border-radius: var(--radius); margin-bottom: 24px;
+}
+.vol-panel-header .vol-avatar { width: 48px; height: 48px; font-size: 16px; }
+.vol-panel-header .vph-name { font-weight: 700; font-size: 17px; }
+.vol-panel-header .vph-sub { font-size: 12px; color: var(--grey-muted); margin-top: 2px; }
+
+/* ══════════════════════════════════════
+   CONTROLADOR — GRID VOLUNTÁRIOS
+   ══════════════════════════════════════ */
+.vol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.vol-card {
+  background: var(--grey-dark);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius); padding: 16px;
+  transition: border-color .15s;
+}
+.vol-card:hover { border-color: var(--grey-mid); }
+.vol-card-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.vol-card-funcs { font-size: 11px; color: var(--grey-muted); margin-bottom: 10px; line-height: 1.5; }
+.vol-card-indisp { font-size: 11px; color: #ff9070; margin-bottom: 10px; }
+.vol-card-actions { display: flex; gap: 6px; }
+
+/* ══════════════════════════════════════
+   ESCALA OUTPUT
+   ══════════════════════════════════════ */
+.schedule-out {
+  background: var(--black-card);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-lg); padding: 28px;
+  margin-top: 16px;
+}
+.schedule-out h3 {
+  font-family: var(--font-display);
+  font-size: 24px; letter-spacing: 2px;
+  color: var(--olive-light); margin-bottom: 24px; text-align: center;
+}
+.sched-section { margin-bottom: 28px; }
+.sched-section-title {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--olive-light); margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--grey-border);
+}
+.sched-row {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 10px;
+}
+.sched-date { font-weight: 700; font-size: 13px; color: var(--white); min-width: 90px; }
+.sched-pill {
+  background: var(--grey-dark);
+  border: 1px solid var(--grey-border);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 12px; display: inline-flex; gap: 5px; align-items: center;
+}
+.sched-pill-label { color: var(--olive-light); font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
+.sched-pill-name { color: var(--off-white); }
+
+/* ══════════════════════════════════════
+   LOADING
+   ══════════════════════════════════════ */
+.loading-wrap { text-align: center; padding: 48px 20px; }
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid var(--grey-border);
+  border-top-color: var(--olive);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: var(--grey-muted); }
+
+/* ══════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 13px 20px; border-radius: var(--radius);
+  color: var(--white); font-size: 14px; font-weight: 500;
+  z-index: 999; transform: translateY(80px); opacity: 0;
+  transition: all .3s; max-width: 320px; box-shadow: var(--shadow);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: #1a3a26; border: 1px solid var(--success); color: #6fcf97; }
+.toast.error { background: #3a1a1a; border: 1px solid var(--danger); color: #ff7070; }
+
+/* ══════════════════════════════════════
+   MODAL
+   ══════════════════════════════════════ */
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 300; display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--black-card);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-lg); padding: 32px;
+  max-width: 400px; width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+.modal h3 { font-family: var(--font-display); font-size: 22px; letter-spacing: 1.5px; margin-bottom: 8px; }
+.modal p { font-size: 14px; color: var(--grey-muted); margin-bottom: 24px; line-height: 1.6; }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ══════════════════════════════════════
+   MISC
+   ══════════════════════════════════════ */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--grey-muted); font-size: 13px;
+  cursor: pointer; margin-bottom: 20px;
+  background: none; border: none;
+  font-family: var(--font-body); transition: color .15s;
+}
+.back-btn:hover { color: var(--olive-light); }
+.divider { height: 1px; background: var(--grey-border); margin: 24px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--grey-muted); font-size: 14px; }
+.empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+.info-box {
+  background: var(--olive-bg); border: 1px solid var(--olive);
+  border-radius: var(--radius); padding: 14px 18px;
+  font-size: 13px; color: var(--olive-pale); margin-bottom: 16px;
+  display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+}
+.warn-box {
+  background: rgba(201,154,46,0.1); border: 1px solid rgba(201,154,46,0.4);
+  border-radius: var(--radius); padding: 14px 18px;
+  font-size: 13px; color: var(--warn); margin-bottom: 16px;
+  line-height: 1.5;
+}
+.db-status {
+  font-size: 11px; display: flex; align-items: center; gap: 5px;
+  color: var(--grey-muted); padding: 6px 12px;
+  background: var(--grey-dark); border-radius: 20px;
+  border: 1px solid var(--grey-border);
+}
+.db-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.db-dot.ok { background: var(--success); }
+.db-dot.err { background: var(--danger); }
+.db-dot.loading { background: var(--warn); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+@media (max-width: 640px) {
+  .two-col { grid-template-columns: 1fr; }
+  .funcoes-grid { grid-template-columns: 1fr 1fr; }
+  .home-hero h2 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <div class="logo-emblem">
+        <svg viewBox="0 0 24 24"><path d="M11 2v8H3v3h8v9h3v-9h8v-3h-8V2z"/></svg>
+      </div>
+      <div class="logo-text-wrap">
+        <h1>OAK CHURCH</h1>
+        <span>Carvalhos da Justiça · Franca</span>
+      </div>
+    </div>
+    <div class="header-right" id="headerRight">
+      <div class="db-status" id="dbStatus">
+        <div class="db-dot loading" id="dbDot"></div>
+        <span id="dbLabel">conectando...</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════
+     HOME
+     ═══════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-hero">
+      <div class="oak-cross">
+        <svg viewBox="0 0 24 24"><path d="M11 2v8H3v3h8v9h3v-9h8v-3h-8V2z"/></svg>
+      </div>
+      <h2>ESCALA<br>EQUIPE</h2>
+      <p>Gerencie sua disponibilidade<br>ou acesse o painel de controle</p>
+    </div>
+    <div class="access-card">
+      <button class="access-btn ab-vol" onclick="showVolLogin()">
+        <div class="ab-icon">🙋</div>
+        <div>
+          <div class="ab-label">Sou Voluntário</div>
+          <div class="ab-sub">Informar indisponibilidade e funções</div>
+        </div>
+      </button>
+      <button class="access-btn ab-ctrl" onclick="showCtrlLogin()">
+        <div class="ab-icon">⚙️</div>
+        <div>
+          <div class="ab-label">Controlador</div>
+          <div class="ab-sub">Gerenciar equipe e gerar escalas</div>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     LOGIN — VOLUNTÁRIO
+     ═══════════════════════════════════ -->
+<div id="screen-vol-login" class="screen">
+  <div class="main-wrap">
+    <button class="back-btn" onclick="goHome()">← Voltar</button>
+    <div class="page-header">
+      <div class="page-title">ACESSO</div>
+      <div class="page-sub">Entre com seu nome e senha pessoal</div>
+    </div>
+    <div class="card" style="max-width:420px">
+      <div class="form-group">
+        <label>Seu nome</label>
+        <select id="volLoginName">
+          <option value="">Selecione seu nome...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="volLoginPass" placeholder="Sua senha pessoal"
+               onkeydown="if(event.key==='Enter')doVolLogin()">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="doVolLogin()">Entrar</button>
+      <p style="font-size:12px;color:var(--grey-muted);margin-top:14px;text-align:center">
+        Primeiro acesso? Peça sua senha ao líder da equipe.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAINEL — VOLUNTÁRIO
+     ═══════════════════════════════════ -->
+<div id="screen-vol-panel" class="screen">
+  <div class="main-wrap">
+    <button class="back-btn" onclick="logoutVol()">← Sair</button>
+    <div id="volPanelBanner"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tab-indisp',this)">📅 Indisponibilidade</button>
+      <button class="tab" onclick="switchTab('tab-funcoes',this)">🎛️ Funções</button>
+    </div>
+
+    <!-- TAB INDISPONIBILIDADE -->
+    <div id="tab-indisp" class="tab-content active">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">📅</span> Dias que não posso ser escalado</div>
+        <div class="info-box">
+          ℹ️ Marque apenas <strong>quartas-feiras</strong> e <strong>domingos</strong>.
+          Para domingos, escolha se é só de manhã, só à noite ou o dia todo.
+        </div>
+
+        <div class="month-nav">
+          <button onclick="changeCalMonth(-1)">‹</button>
+          <span class="month-label" id="calMonthLabel"></span>
+          <button onclick="changeCalMonth(1)">›</button>
+        </div>
+
+        <div class="cal-outer">
+          <table class="cal-table">
+            <thead>
+              <tr><th>Dom</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sáb</th></tr>
+            </thead>
+            <tbody id="calBody"></tbody>
+          </table>
+        </div>
+
+        <div class="legend" style="margin-top:14px">
+          <div class="legend-item"><div class="ld" style="background:#1a1a1a;border:1px solid #444"></div>Domingo / Quarta</div>
+          <div class="legend-item"><div class="ld" style="background:var(--danger)"></div>Dia todo</div>
+          <div class="legend-item"><div class="ld" style="background:linear-gradient(180deg,#c9852a 50%,#1a1a1a 50%)"></div>Só manhã</div>
+          <div class="legend-item"><div class="ld" style="background:linear-gradient(180deg,#1a1a1a 50%,#5a3ab5 50%)"></div>Só noite</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="margin-bottom:10px;font-size:13px;color:var(--grey-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px">
+          Dias marcados
+        </div>
+        <div class="indisp-tags" id="indispTags"></div>
+
+        <div style="margin-top:24px">
+          <button class="btn btn-primary" onclick="saveIndisp()" id="btnSaveIndisp">
+            💾 Salvar Indisponibilidade
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB FUNÇÕES -->
+    <div id="tab-funcoes" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🎛️</span> Funções que sei executar</div>
+        <p style="font-size:13px;color:var(--grey-muted);margin-bottom:20px;line-height:1.6">
+          Marque todas as funções que você sabe executar. Se fez um novo treinamento, atualize aqui!
+        </p>
+        <div class="funcoes-grid" id="funcoesList"></div>
+        <div style="margin-top:24px">
+          <button class="btn btn-primary" onclick="saveFuncoes()">💾 Salvar Funções</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     LOGIN — CONTROLADOR
+     ═══════════════════════════════════ -->
+<div id="screen-ctrl-login" class="screen">
+  <div class="main-wrap">
+    <button class="back-btn" onclick="goHome()">← Voltar</button>
+    <div class="card" style="max-width:420px;margin:0 auto">
+      <div class="card-title"><span class="card-title-icon">🔐</span> ACESSO CONTROLADOR</div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="ctrlPassword" placeholder="Senha do controlador"
+               onkeydown="if(event.key==='Enter')doCtrlLogin()">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="doCtrlLogin()">Entrar</button>
+      <p style="font-size:12px;color:var(--grey-muted);margin-top:14px;text-align:center">
+        Senha padrão: <strong style="color:var(--olive-light)">oak2026</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAINEL — CONTROLADOR
+     ═══════════════════════════════════ -->
+<div id="screen-ctrl-panel" class="screen">
+  <div class="main-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="page-title">PAINEL</div>
+        <div class="page-sub">Gerencie a equipe e gere escalas com IA</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logoutCtrl()">Sair</button>
+    </div>
+
+    <div class="tabs" style="margin-top:24px">
+      <button class="tab active" onclick="switchTab('ctab-equipe',this)">👥 Equipe</button>
+      <button class="tab" onclick="switchTab('ctab-gerar',this)">🗓 Gerar Escala</button>
+      <button class="tab" onclick="switchTab('ctab-config',this)">⚙️ Config</button>
+    </div>
+
+    <!-- CTAB EQUIPE -->
+    <div id="ctab-equipe" class="tab-content active">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px;flex-wrap:wrap">
+        <span style="font-size:13px;color:var(--grey-muted)" id="ctrlEquipeCount"></span>
+        <button class="btn btn-primary btn-sm" onclick="showAddVol()">+ Novo Voluntário</button>
+      </div>
+      <div class="vol-grid" id="ctrlVolGrid"></div>
+    </div>
+
+    <!-- CTAB GERAR -->
+    <div id="ctab-gerar" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🗓</span> GERAR ESCALA MENSAL</div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Mês</label>
+            <select id="genMes">
+              <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+              <option value="3">Março</option><option value="4">Abril</option>
+              <option value="5">Maio</option><option value="6">Junho</option>
+              <option value="7">Julho</option><option value="8">Agosto</option>
+              <option value="9">Setembro</option><option value="10">Outubro</option>
+              <option value="11">Novembro</option><option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ano</label>
+            <select id="genAno">
+              <option value="2026">2026</option><option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Observações especiais (opcional)</label>
+          <input type="text" id="genObs" placeholder="Ex: Não haverá culto na quarta dia 25...">
+        </div>
+        <button class="btn btn-white" onclick="gerarEscala()" id="btnGerar">
+          ✨ Gerar Escala com IA
+        </button>
+      </div>
+      <div id="scheduleOutput"></div>
+    </div>
+
+    <!-- CTAB CONFIG -->
+    <div id="ctab-config" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🔑</span> CHAVE API ANTHROPIC</div>
+        <div class="info-box">ℹ️ Necessária para gerar escalas. Salva apenas neste navegador.</div>
+        <div class="form-group">
+          <label>API Key (sk-ant-...)</label>
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveApiKey()">Salvar Chave</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">🔐</span> ALTERAR SENHA DO CONTROLADOR</div>
+        <div class="form-group">
+          <label>Nova senha</label>
+          <input type="password" id="newCtrlPw" placeholder="Mínimo 4 caracteres">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="changeCtrlPw()">Alterar</button>
+      </div>
+
+      <div class="card" id="configFirebase">
+        <div class="card-title"><span class="card-title-icon">🔥</span> STATUS FIREBASE</div>
+        <div id="firebaseStatusBlock"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="card-title-icon">⚠️</span> ZONA DE PERIGO</div>
+        <button class="btn btn-danger btn-sm" onclick="confirmClear()">Resetar dados locais</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     ADICIONAR VOLUNTÁRIO
+     ═══════════════════════════════════ -->
+<div id="screen-add-vol" class="screen">
+  <div class="main-wrap" style="max-width:640px;margin:0 auto">
+    <button class="back-btn" onclick="showCtrlPanel()">← Painel</button>
+    <div class="page-header">
+      <div class="page-title">NOVO VOLUNTÁRIO</div>
+    </div>
+    <div class="card">
+      <div class="two-col">
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" id="addVolName" placeholder="Nome do voluntário">
+        </div>
+        <div class="form-group">
+          <label>Senha inicial</label>
+          <input type="text" id="addVolPw" placeholder="Ex: oak123">
+        </div>
+      </div>
+      <div style="margin-bottom:14px;font-size:11px;color:var(--grey-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600">Funções</div>
+      <div class="funcoes-grid" id="addVolFuncoes"></div>
+      <div style="margin-top:24px;display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="saveNewVol()">💾 Cadastrar</button>
+        <button class="btn btn-outline" onclick="showCtrlPanel()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PERÍODO POPUP (domingo) -->
+<div class="periodo-popup" id="periodPopup">
+  <h4>Indisponível quando?</h4>
+  <div class="periodo-option" onclick="setPeriodo('manha')">☀️ Só de manhã</div>
+  <div class="periodo-option" onclick="setPeriodo('noite')">🌙 Só à noite</div>
+  <div class="periodo-option" onclick="setPeriodo('full')">🚫 Dia todo</div>
+  <button class="periodo-clear" onclick="setPeriodo(null)">Remover marcação</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Confirmar</h3>
+    <p id="modalMsg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="modalConfirmBtn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════════════════
+const FUNCOES = [
+  'PTZ 1','PTZ 2','Câmera Móvel','Corte (Live)',
+  'Mix Live (Mesa)','Projetor','Iluminação',
+  'Fotografia','Stories','Interação'
+];
+
+const MONTH_NAMES = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                     'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// ════════════════════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════════════════════
+let currentVol = null; // nome do voluntário logado
+let isCtrl = false;
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let pendingDayClick = null; // { day, isWed } para o popup de período
+let firebaseOk = false;
+
+// ── LOCAL CONFIG (não sincronizado) ──
+function getLocalConfig() {
+  try { return JSON.parse(localStorage.getItem('oak_config') || '{}'); }
+  catch(e) { return {}; }
+}
+function saveLocalConfig(d) { localStorage.setItem('oak_config', JSON.stringify(d)); }
+
+// ════════════════════════════════════════════════════════
+// FIREBASE — WRAPPER
+// ════════════════════════════════════════════════════════
+async function fbGet(path) {
+  if (!firebaseOk) throw new Error('Firebase não configurado');
+  const { doc, getDoc } = window._fbFns;
+  const parts = path.split('/');
+  const ref = doc(window._db, parts[0], parts.slice(1).join('/'));
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data() : null;
+}
+
+async function fbSet(path, data) {
+  if (!firebaseOk) throw new Error('Firebase não configurado');
+  const { doc, setDoc } = window._fbFns;
+  const parts = path.split('/');
+  const ref = doc(window._db, parts[0], parts.slice(1).join('/'));
+  await setDoc(ref, data, { merge: true });
+}
+
+async function fbGetAll(colName) {
+  if (!firebaseOk) throw new Error('Firebase não configurado');
+  const { collection, getDocs } = window._fbFns;
+  const snap = await getDocs(collection(window._db, colName));
+  const results = [];
+  snap.forEach(d => results.push({ id: d.id, ...d.data() }));
+  return results;
+}
+
+async function fbDelete(path) {
+  if (!firebaseOk) throw new Error('Firebase não configurado');
+  const { doc, deleteDoc } = window._fbFns;
+  const parts = path.split('/');
+  const ref = doc(window._db, parts[0], parts.slice(1).join('/'));
+  await deleteDoc(ref);
+}
+
+// ── Firebase ready ──
+document.addEventListener('firebaseReady', async () => {
+  firebaseOk = true;
+  setDbStatus('ok', 'conectado');
+  await initDefaultData();
+});
+
+// Timeout se Firebase não responder
+setTimeout(() => {
+  if (!firebaseOk) setDbStatus('err', 'sem Firebase');
+}, 6000);
+
+function setDbStatus(state, label) {
+  const dot = document.getElementById('dbDot');
+  const lbl = document.getElementById('dbLabel');
+  dot.className = `db-dot ${state}`;
+  lbl.textContent = label;
+}
+
+// ════════════════════════════════════════════════════════
+// INIT — Seed voluntários padrão se Firebase vazio
+// ════════════════════════════════════════════════════════
+const DEFAULT_VOLS = [
+  { nome:'LAUAN',            funcoes:['PTZ 1','PTZ 2','Corte (Live)','Stories'],               senha:'oak2026' },
+  { nome:'SARA',             funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Corte (Live)','Projetor','Iluminação','Fotografia'], senha:'oak2026' },
+  { nome:'ALISON MATOS',     funcoes:['PTZ 1','PTZ 2','Corte (Live)','Interação'],             senha:'oak2026' },
+  { nome:'ALISON PILOTO',    funcoes:['Mix Live (Mesa)'],                                       senha:'oak2026' },
+  { nome:'ANTONIO',          funcoes:['PTZ 1','PTZ 2','Corte (Live)','Mix Live (Mesa)','Projetor','Iluminação','Interação'], senha:'oak2026' },
+  { nome:'DANIEL',           funcoes:['PTZ 1','PTZ 2','Corte (Live)','Projetor','Iluminação'], senha:'oak2026' },
+  { nome:'DUDA PORTELA',     funcoes:['Projetor','Iluminação'],                                 senha:'oak2026' },
+  { nome:'FERNANDO',         funcoes:['PTZ 1','PTZ 2','Corte (Live)','Projetor','Iluminação'], senha:'oak2026' },
+  { nome:'GUILHERME',        funcoes:['PTZ 1','PTZ 2','Câmera Móvel'],                         senha:'oak2026' },
+  { nome:'ICARO',            funcoes:['Mix Live (Mesa)','Iluminação'],                          senha:'oak2026' },
+  { nome:'JOAO PEDRO',       funcoes:['Iluminação'],                                            senha:'oak2026' },
+  { nome:'JULIA',            funcoes:['Stories'],                                               senha:'oak2026' },
+  { nome:'LAIRA LAMARCA',    funcoes:['Projetor','Iluminação'],                                 senha:'oak2026' },
+  { nome:'LUAN CRUZ',        funcoes:['Corte (Live)'],                                          senha:'oak2026' },
+  { nome:'MARIA LAURA',      funcoes:['Câmera Móvel','Projetor','Fotografia'],                  senha:'oak2026' },
+  { nome:'MARINA',           funcoes:['Stories'],                                               senha:'oak2026' },
+  { nome:'MAYSA',            funcoes:['Câmera Móvel','Projetor','Iluminação','Fotografia'],     senha:'oak2026' },
+  { nome:'MIGUEL',           funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Projetor','Iluminação'], senha:'oak2026' },
+  { nome:'NICOLLAS',         funcoes:['Projetor','Iluminação'],                                 senha:'oak2026' },
+  { nome:'SAMUEL',           funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Projetor','Iluminação'], senha:'oak2026' },
+  { nome:'SIMONE',           funcoes:['Fotografia'],                                            senha:'oak2026' },
+  { nome:'ANTONELA',         funcoes:['PTZ 1','PTZ 2'],                                         senha:'oak2026' },
+  { nome:'ANNA JULIA',       funcoes:['Stories'],                                               senha:'oak2026' },
+  { nome:'VICTOR',           funcoes:['PTZ 1','PTZ 2','Projetor','Iluminação'],                 senha:'oak2026' },
+];
+
+async function initDefaultData() {
+  try {
+    const cfg = await fbGet('config/app');
+    if (!cfg) {
+      // Seed voluntários
+      for (const v of DEFAULT_VOLS) {
+        const id = v.nome.replace(/\s+/g,'_').toLowerCase();
+        await fbSet(`voluntarios/${id}`, { nome: v.nome, funcoes: v.funcoes, senha: v.senha, indisponibilidade: {} });
+      }
+      // Seed config
+      await fbSet('config/app', { senha_ctrl: 'oak2026', seed: true });
+      showToast('Dados iniciais carregados!', 'success');
+    }
+    // Popular select de login
+    await popularSelectVols();
+  } catch(e) {
+    console.warn('Firebase init:', e);
+  }
+}
+
+async function popularSelectVols() {
+  try {
+    const vols = await fbGetAll('voluntarios');
+    const sel = document.getElementById('volLoginName');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione seu nome...</option>';
+    vols.sort((a,b) => a.nome.localeCompare(b.nome));
+    vols.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.id || v.nome.replace(/\s+/g,'_').toLowerCase();
+      opt.textContent = v.nome;
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+// ════════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome() { currentVol = null; isCtrl = false; showScreen('screen-home'); }
+function showVolLogin() { popularSelectVols(); showScreen('screen-vol-login'); }
+function showCtrlLogin() { showScreen('screen-ctrl-login'); }
+function showCtrlPanel() { showScreen('screen-ctrl-panel'); renderCtrlPanel(); }
+function showAddVol() { showScreen('screen-add-vol'); renderAddVolFuncoes(); }
+function logoutVol() { currentVol = null; goHome(); }
+function logoutCtrl() { isCtrl = false; goHome(); }
+
+// ════════════════════════════════════════════════════════
+// LOGIN VOLUNTÁRIO
+// ════════════════════════════════════════════════════════
+async function doVolLogin() {
+  if (!firebaseOk) { showToast('Firebase não conectado', 'error'); return; }
+  const selEl = document.getElementById('volLoginName');
+  const volId = selEl.value;
+  const pass = document.getElementById('volLoginPass').value;
+
+  if (!volId) { showToast('Selecione seu nome', 'error'); return; }
+  if (!pass) { showToast('Digite sua senha', 'error'); return; }
+
+  try {
+    const data = await fbGet(`voluntarios/${volId}`);
+    if (!data) { showToast('Voluntário não encontrado', 'error'); return; }
+    if (data.senha !== pass) { showToast('Senha incorreta', 'error'); return; }
+
+    currentVol = { id: volId, ...data };
+    showScreen('screen-vol-panel');
+    renderVolPanel();
+  } catch(e) {
+    showToast('Erro ao conectar: ' + e.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// PAINEL VOLUNTÁRIO
+// ════════════════════════════════════════════════════════
+function renderVolPanel() {
+  const v = currentVol;
+  const initials = v.nome.split(' ').slice(0,2).map(x=>x[0]).join('');
+  document.getElementById('volPanelBanner').innerHTML = `
+    <div class="vol-panel-header">
+      <div class="vol-avatar">${initials}</div>
+      <div>
+        <div class="vph-name">${v.nome}</div>
+        <div class="vph-sub">${(v.funcoes||[]).length} função(ões) · Atualize suas informações abaixo</div>
+      </div>
+    </div>`;
+
+  // Inicia no próximo mês
+  const now = new Date();
+  calYear = now.getMonth() === 11 ? now.getFullYear()+1 : now.getFullYear();
+  calMonth = (now.getMonth()+1) % 12;
+
+  renderCalendar();
+  renderFuncoesList(v.funcoes || []);
+}
+
+// ════════════════════════════════════════════════════════
+// CALENDÁRIO
+// ════════════════════════════════════════════════════════
+function getIndisp() {
+  return (currentVol?.indisponibilidade || {});
+}
+function getMonthKey() {
+  return `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+}
+function getDayIndisp(day) {
+  return (getIndisp()[getMonthKey()] || {})[day] || null;
+  // null | 'manha' | 'noite' | 'full'
+}
+
+function renderCalendar() {
+  document.getElementById('calMonthLabel').textContent =
+    `${MONTH_NAMES[calMonth+1]} ${calYear}`;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let html = '';
+  let day = 1;
+  for (let week = 0; week < 6; week++) {
+    if (day > daysInMonth) break;
+    html += '<tr>';
+    for (let dow = 0; dow < 7; dow++) {
+      if (week === 0 && dow < firstDay) {
+        html += '<td class="cal-day cal-empty"></td>'; continue;
+      }
+      if (day > daysInMonth) { html += '<td class="cal-day cal-empty"></td>'; continue; }
+
+      const date = new Date(calYear, calMonth, day);
+      const isPast = date < today;
+      const isSun = dow === 0;
+      const isWed = dow === 3;
+      const isCulto = isSun || isWed;
+      const indisp = getDayIndisp(day);
+
+      let cls = 'cal-day';
+      if (isPast) cls += ' cal-past';
+      else if (!isCulto) cls += ''; // dia normal, sem ação
+      else if (indisp === 'full') cls += ' cal-unavail-full';
+      else if (indisp === 'manha') cls += ' cal-unavail-manha';
+      else if (indisp === 'noite') cls += ' cal-unavail-noite';
+      else if (isSun) cls += ' cal-sunday';
+      else if (isWed) cls += ' cal-wednesday';
+
+      const label = isSun ? 'Dom' : isWed ? 'Qua' : '';
+      let indispLabel = '';
+      if (indisp === 'manha') indispLabel = '<span class="day-indisp-indicator">manhã</span>';
+      else if (indisp === 'noite') indispLabel = '<span class="day-indisp-indicator">noite</span>';
+      else if (indisp === 'full') indispLabel = '<span class="day-indisp-indicator">todo</span>';
+
+      const onclick = (!isPast && isCulto) ? `onclick="onDayClick(event,${day},${isSun},${isWed})"` : '';
+
+      html += `<td class="${cls}" ${onclick}>
+        <span class="day-num">${day}</span>
+        ${label ? `<span class="day-label">${label}</span>` : ''}
+        ${indispLabel}
+      </td>`;
+      day++;
+    }
+    html += '</tr>';
+  }
+  document.getElementById('calBody').innerHTML = html;
+  renderIndispTags();
+}
+
+function changeCalMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+// ── Click no dia ──
+function onDayClick(event, day, isSun, isWed) {
+  if (isSun) {
+    // Domingo → popup de período
+    pendingDayClick = { day };
+    const popup = document.getElementById('periodPopup');
+    popup.style.left = Math.min(event.clientX, window.innerWidth - 220) + 'px';
+    popup.style.top = Math.min(event.clientY + 8, window.innerHeight - 180) + 'px';
+    popup.classList.add('open');
+
+    // Marca opção atual
+    const cur = getDayIndisp(day);
+    popup.querySelectorAll('.periodo-option').forEach(el => el.classList.remove('selected'));
+    if (cur === 'manha') popup.querySelectorAll('.periodo-option')[0].classList.add('selected');
+    else if (cur === 'noite') popup.querySelectorAll('.periodo-option')[1].classList.add('selected');
+    else if (cur === 'full') popup.querySelectorAll('.periodo-option')[2].classList.add('selected');
+  } else if (isWed) {
+    // Quarta → toggle full
+    const cur = getDayIndisp(day);
+    setDayIndisp(day, cur ? null : 'full');
+  }
+}
+
+document.addEventListener('click', e => {
+  const popup = document.getElementById('periodPopup');
+  if (popup.classList.contains('open') && !popup.contains(e.target)) {
+    popup.classList.remove('open');
+    pendingDayClick = null;
+  }
+});
+
+function setPeriodo(tipo) {
+  if (!pendingDayClick) return;
+  setDayIndisp(pendingDayClick.day, tipo);
+  document.getElementById('periodPopup').classList.remove('open');
+  pendingDayClick = null;
+}
+
+function setDayIndisp(day, tipo) {
+  if (!currentVol) return;
+  const mk = getMonthKey();
+  if (!currentVol.indisponibilidade) currentVol.indisponibilidade = {};
+  if (!currentVol.indisponibilidade[mk]) currentVol.indisponibilidade[mk] = {};
+  if (tipo === null) {
+    delete currentVol.indisponibilidade[mk][day];
+  } else {
+    currentVol.indisponibilidade[mk][day] = tipo;
+  }
+  renderCalendar();
+}
+
+function renderIndispTags() {
+  const mk = getMonthKey();
+  const days = currentVol?.indisponibilidade?.[mk] || {};
+  const el = document.getElementById('indispTags');
+  const entries = Object.entries(days).sort((a,b) => parseInt(a)-parseInt(b));
+
+  if (!entries.length) {
+    el.innerHTML = '<span style="font-size:13px;color:var(--grey-muted)">Nenhum dia marcado neste mês</span>';
+    return;
+  }
+  const labels = { full:'Dia todo', manha:'Manhã', noite:'Noite' };
+  const cls = { full:'itag-full', manha:'itag-manha', noite:'itag-noite' };
+  el.innerHTML = entries.map(([day, tipo]) =>
+    `<span class="itag ${cls[tipo]}">
+      ${day}/${calMonth+1} · ${labels[tipo]}
+      <button onclick="setDayIndisp(${day},null)">×</button>
+    </span>`).join('');
+}
+
+async function saveIndisp() {
+  if (!currentVol || !firebaseOk) { showToast('Erro ao salvar', 'error'); return; }
+  const btn = document.getElementById('btnSaveIndisp');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try {
+    await fbSet(`voluntarios/${currentVol.id}`, {
+      indisponibilidade: currentVol.indisponibilidade || {}
+    });
+    showToast('Indisponibilidade salva! ✅', 'success');
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.innerHTML = '💾 Salvar Indisponibilidade';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// FUNÇÕES DO VOLUNTÁRIO
+// ════════════════════════════════════════════════════════
+function renderFuncoesList(selected) {
+  document.getElementById('funcoesList').innerHTML = FUNCOES.map(f => {
+    const chk = selected.includes(f);
+    return `<label class="func-check ${chk?'checked':''}"
+      onclick="this.classList.toggle('checked');this.querySelector('input').checked=!this.querySelector('input').checked;event.preventDefault()">
+      <input type="checkbox" ${chk?'checked':''} style="pointer-events:none">
+      <span>${f}</span>
+    </label>`;
+  }).join('');
+}
+
+async function saveFuncoes() {
+  if (!currentVol || !firebaseOk) { showToast('Erro ao salvar', 'error'); return; }
+  const funcoes = Array.from(document.querySelectorAll('#funcoesList .func-check.checked span'))
+    .map(el => el.textContent);
+  try {
+    await fbSet(`voluntarios/${currentVol.id}`, { funcoes });
+    currentVol.funcoes = funcoes;
+    showToast('Funções atualizadas! ✅', 'success');
+    // Atualiza banner
+    document.querySelector('.vph-sub').textContent =
+      `${funcoes.length} função(ões) · Atualize suas informações abaixo`;
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// LOGIN CONTROLADOR
+// ════════════════════════════════════════════════════════
+async function doCtrlLogin() {
+  const pw = document.getElementById('ctrlPassword').value;
+  if (!pw) { showToast('Digite a senha', 'error'); return; }
+  try {
+    let ctrlPw = 'oak2026';
+    if (firebaseOk) {
+      const cfg = await fbGet('config/app');
+      if (cfg?.senha_ctrl) ctrlPw = cfg.senha_ctrl;
+    }
+    if (pw !== ctrlPw) { showToast('Senha incorreta', 'error'); return; }
+    isCtrl = true;
+    document.getElementById('ctrlPassword').value = '';
+    showCtrlPanel();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// PAINEL CONTROLADOR
+// ════════════════════════════════════════════════════════
+async function renderCtrlPanel() {
+  if (!firebaseOk) {
+    document.getElementById('ctrlVolGrid').innerHTML =
+      '<div class="warn-box">⚠️ Firebase não conectado. Configure o Firebase para ver os dados da equipe.</div>';
+    return;
+  }
+  try {
+    const vols = await fbGetAll('voluntarios');
+    vols.sort((a,b) => a.nome.localeCompare(b.nome));
+    document.getElementById('ctrlEquipeCount').textContent =
+      `${vols.length} voluntários cadastrados`;
+
+    document.getElementById('ctrlVolGrid').innerHTML = vols.map(v => {
+      const totalIndisp = Object.values(v.indisponibilidade||{})
+        .reduce((acc, m) => acc + Object.keys(m).length, 0);
+      return `
+      <div class="vol-card">
+        <div class="vol-card-name">${v.nome}</div>
+        <div class="vol-card-funcs">${(v.funcoes||[]).join(', ') || 'Sem funções'}</div>
+        ${totalIndisp ? `<div class="vol-card-indisp">⚠ ${totalIndisp} dia(s) indisponível</div>` : ''}
+        <div class="vol-card-actions">
+          <button class="btn btn-outline btn-xs" onclick="ctrlResetPw('${v.id}','${v.nome}')">🔑 Senha</button>
+          <button class="btn btn-danger btn-xs" onclick="ctrlRemoveVol('${v.id}','${v.nome}')">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    showToast('Erro ao carregar equipe: ' + e.message, 'error');
+  }
+
+  // API key local
+  const cfg = getLocalConfig();
+  document.getElementById('apiKeyInput').value = cfg.apiKey || '';
+
+  // Firebase status
+  document.getElementById('firebaseStatusBlock').innerHTML = firebaseOk
+    ? `<div class="info-box">✅ Firebase conectado e funcionando. Dados compartilhados entre todos os dispositivos.</div>`
+    : `<div class="warn-box">⚠️ Firebase não configurado. Edite o bloco <code>firebaseConfig</code> no início do arquivo HTML com suas credenciais do Firebase Console.</div>`;
+
+  // Default gen month
+  const now = new Date();
+  document.getElementById('genMes').value = (now.getMonth() + 2 > 12) ? 1 : now.getMonth() + 2;
+}
+
+function ctrlRemoveVol(id, nome) {
+  openModal('Remover Voluntário', `Remover "${nome}" da equipe?`, async () => {
+    await fbDelete(`voluntarios/${id}`);
+    showToast(`${nome} removido`, 'success');
+    renderCtrlPanel();
+  });
+}
+
+function ctrlResetPw(id, nome) {
+  openModal('Redefinir Senha', `Redefinir a senha de "${nome}" para "oak2026"?`, async () => {
+    await fbSet(`voluntarios/${id}`, { senha: 'oak2026' });
+    showToast(`Senha de ${nome} redefinida para "oak2026"`, 'success');
+  });
+}
+
+// ── ADICIONAR VOLUNTÁRIO ──
+function renderAddVolFuncoes() {
+  document.getElementById('addVolFuncoes').innerHTML = FUNCOES.map(f => `
+    <label class="func-check"
+      onclick="this.classList.toggle('checked');this.querySelector('input').checked=!this.querySelector('input').checked;event.preventDefault()">
+      <input type="checkbox" style="pointer-events:none">
+      <span>${f}</span>
+    </label>`).join('');
+  document.getElementById('addVolName').value = '';
+  document.getElementById('addVolPw').value = '';
+}
+
+async function saveNewVol() {
+  const nome = document.getElementById('addVolName').value.trim().toUpperCase();
+  const senha = document.getElementById('addVolPw').value.trim();
+  if (!nome) { showToast('Digite o nome', 'error'); return; }
+  if (!senha) { showToast('Defina uma senha inicial', 'error'); return; }
+
+  const funcoes = Array.from(document.querySelectorAll('#addVolFuncoes .func-check.checked span'))
+    .map(el => el.textContent);
+
+  const id = nome.replace(/\s+/g,'_').toLowerCase();
+  try {
+    const exists = await fbGet(`voluntarios/${id}`);
+    if (exists) { showToast('Voluntário já existe', 'error'); return; }
+    await fbSet(`voluntarios/${id}`, { nome, funcoes, senha, indisponibilidade: {} });
+    showToast(`${nome} cadastrado!`, 'success');
+    showCtrlPanel();
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// CONFIGURAÇÕES
+// ════════════════════════════════════════════════════════
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const cfg = getLocalConfig();
+  cfg.apiKey = key;
+  saveLocalConfig(cfg);
+  showToast('Chave da API salva!', 'success');
+}
+
+async function changeCtrlPw() {
+  const pw = document.getElementById('newCtrlPw').value;
+  if (pw.length < 4) { showToast('Mínimo 4 caracteres', 'error'); return; }
+  try {
+    await fbSet('config/app', { senha_ctrl: pw });
+    document.getElementById('newCtrlPw').value = '';
+    showToast('Senha alterada!', 'success');
+  } catch(e) {
+    showToast('Erro: ' + e.message, 'error');
+  }
+}
+
+function confirmClear() {
+  openModal('Resetar Config Local', 'Isso apaga a chave da API salva neste navegador.', () => {
+    localStorage.removeItem('oak_config');
+    showToast('Config 
