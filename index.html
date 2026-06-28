@@ -1040,30 +1040,24 @@ async function fbDelete(path) {
   await deleteDoc(ref);
 }
 
-// ── Firebase ready — polling robusto ──
-// Não depende de evento (evita race condition no GitHub Pages)
+// ── Firebase ready — polling simples ──
 function waitForFirebase() {
   let attempts = 0;
-  const MAX = 30; // 30 x 300ms = 9 segundos
   const interval = setInterval(async () => {
     attempts++;
     if (window._firebaseReady && window._db) {
       clearInterval(interval);
       firebaseOk = true;
       setDbStatus('ok', 'conectado');
-      await initDefaultData();
-    } else if (attempts >= MAX) {
+      try { await initDefaultData(); } catch(e) { console.warn('initDefaultData:', e); }
+    } else if (attempts >= 40) {
       clearInterval(interval);
       setDbStatus('err', 'sem conexão');
     }
-  }, 300);
+  }, 250);
 }
-// Inicia polling quando DOM estiver pronto
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', waitForFirebase);
-} else {
-  waitForFirebase();
-}
+// Garante que o polling só começa depois de todo o JS da página estar carregado
+window.addEventListener('load', waitForFirebase);
 
 function setDbStatus(state, label) {
   const dot = document.getElementById('dbDot');
@@ -1148,17 +1142,26 @@ function showScreen(id) {
 }
 function goHome() { currentVol = null; isCtrl = false; showScreen('screen-home'); }
 function showVolLogin() {
-  if (!firebaseOk) {
+  if (!firebaseOk && !window._firebaseReady) {
     showToast('Aguarde, conectando ao servidor...', 'error');
     return;
+  }
+  // Firebase pronto mas polling ainda não atualizou — corrige aqui
+  if (window._firebaseReady && !firebaseOk) {
+    firebaseOk = true;
+    setDbStatus('ok', 'conectado');
   }
   popularSelectVols();
   showScreen('screen-vol-login');
 }
 function showCtrlLogin() {
-  if (!firebaseOk) {
+  if (!firebaseOk && !window._firebaseReady) {
     showToast('Aguarde, conectando ao servidor...', 'error');
     return;
+  }
+  if (window._firebaseReady && !firebaseOk) {
+    firebaseOk = true;
+    setDbStatus('ok', 'conectado');
   }
   showScreen('screen-ctrl-login');
 }
