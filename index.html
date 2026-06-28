@@ -964,6 +964,10 @@ loadScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js', function
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     window._db = firebase.firestore();
     window._firebaseReady = true;
+    // Chama diretamente — sem depender de polling
+    if (typeof waitForFirebase === 'function') {
+      waitForFirebase();
+    }
   });
 });
 </script>
@@ -1029,7 +1033,15 @@ async function fbDelete(path) {
 }
 
 // ── Firebase ready — polling simples ──
-function waitForFirebase() {
+async function waitForFirebase() {
+  // Firebase já pronto — executa direto sem polling
+  if (window._firebaseReady && window._db) {
+    firebaseOk = true;
+    setDbStatus('ok', 'conectado');
+    try { await initDefaultData(); } catch(e) { console.warn('initDefaultData:', e); }
+    return;
+  }
+  // Firebase ainda carregando — aguarda via polling
   let attempts = 0;
   const interval = setInterval(async () => {
     attempts++;
@@ -1044,8 +1056,12 @@ function waitForFirebase() {
     }
   }, 250);
 }
-// Garante que o polling só começa depois de todo o JS da página estar carregado
-window.addEventListener('load', waitForFirebase);
+// Tenta na carga do DOM e também no load (Firebase callback chama direto)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', waitForFirebase);
+} else {
+  setTimeout(waitForFirebase, 100);
+}
 
 function setDbStatus(state, label) {
   const dot = document.getElementById('dbDot');
