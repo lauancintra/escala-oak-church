@@ -23,8 +23,9 @@
     window._db = firebase.firestore();
     window._firebaseReady = true;
     window._fbCompat = true;
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => document.dispatchEvent(new Event('firebaseReady')), 300);
+    // Usa window.load para garantir que todo o JS da página já executou
+    window.addEventListener('load', () => {
+      setTimeout(() => document.dispatchEvent(new Event('firebaseReady')), 500);
     });
   } catch(e) {
     console.error('Firebase init error:', e);
@@ -1035,17 +1036,30 @@ async function fbDelete(path) {
   await window._db.collection(colName).doc(docId).delete();
 }
 
-// ── Firebase ready ──
-document.addEventListener('firebaseReady', async () => {
-  firebaseOk = true;
-  setDbStatus('ok', 'conectado');
-  await initDefaultData();
-});
-
-// Timeout se Firebase não responder
-setTimeout(() => {
-  if (!firebaseOk) setDbStatus('err', 'sem Firebase');
-}, 6000);
+// ── Firebase ready — polling robusto ──
+// Não depende de evento (evita race condition no GitHub Pages)
+function waitForFirebase() {
+  let attempts = 0;
+  const MAX = 30; // 30 x 300ms = 9 segundos
+  const interval = setInterval(async () => {
+    attempts++;
+    if (window._firebaseReady && window._db) {
+      clearInterval(interval);
+      firebaseOk = true;
+      setDbStatus('ok', 'conectado');
+      await initDefaultData();
+    } else if (attempts >= MAX) {
+      clearInterval(interval);
+      setDbStatus('err', 'sem conexão');
+    }
+  }, 300);
+}
+// Inicia polling quando DOM estiver pronto
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', waitForFirebase);
+} else {
+  waitForFirebase();
+}
 
 function setDbStatus(state, label) {
   const dot = document.getElementById('dbDot');
@@ -1129,8 +1143,21 @@ function showScreen(id) {
   window.scrollTo(0,0);
 }
 function goHome() { currentVol = null; isCtrl = false; showScreen('screen-home'); }
-function showVolLogin() { popularSelectVols(); showScreen('screen-vol-login'); }
-function showCtrlLogin() { showScreen('screen-ctrl-login'); }
+function showVolLogin() {
+  if (!firebaseOk) {
+    showToast('Aguarde, conectando ao servidor...', 'error');
+    return;
+  }
+  popularSelectVols();
+  showScreen('screen-vol-login');
+}
+function showCtrlLogin() {
+  if (!firebaseOk) {
+    showToast('Aguarde, conectando ao servidor...', 'error');
+    return;
+  }
+  showScreen('screen-ctrl-login');
+}
 function showCtrlPanel() { showScreen('screen-ctrl-panel'); renderCtrlPanel(); }
 function showAddVol() { showScreen('screen-add-vol'); renderAddVolFuncoes(); }
 function logoutVol() { currentVol = null; goHome(); }
