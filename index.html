@@ -9,6 +9,20 @@
 <!-- Firebase v8 compat — carrega síncrono, sem módulos -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+  // Inicializa Firebase imediatamente após os scripts carregarem
+  var firebaseConfig = {
+    apiKey: "AIzaSyDEuez90toWBDsYegerihaJmvXvDrdTZQQ",
+    authDomain: "escala-comunicacao-oak.firebaseapp.com",
+    projectId: "escala-comunicacao-oak",
+    storageBucket: "escala-comunicacao-oak.firebasestorage.app",
+    messagingSenderId: "495672494020",
+    appId: "1:495672494020:web:f4d0545721515a267b0691"
+  };
+  if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+  window._db = firebase.firestore();
+  window._firebaseReady = true;
+</script>
 
 <style>
 /* ════════════════════════════════════════════════
@@ -948,19 +962,6 @@ select option { background: var(--grey-dark); }
 <div class="toast" id="toast"></div>
 
 <script>
-// ── FIREBASE INIT (v8 compat — síncrono) ──
-var firebaseConfig = {
-  apiKey: "AIzaSyDEuez90toWBDsYegerihaJmvXvDrdTZQQ",
-  authDomain: "escala-comunicacao-oak.firebaseapp.com",
-  projectId: "escala-comunicacao-oak",
-  storageBucket: "escala-comunicacao-oak.firebasestorage.app",
-  messagingSenderId: "495672494020",
-  appId: "1:495672494020:web:f4d0545721515a267b0691"
-};
-if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-window._db = firebase.firestore();
-window._firebaseReady = true;
-
 // ════════════════════════════════════════════════════════
 // CONSTANTES
 // ════════════════════════════════════════════════════════
@@ -1534,4 +1535,4 @@ async function changeCtrlPw() {
 function confirmClear() {
   openModal('Resetar Config Local', 'Isso apaga a chave da API salva neste navegador.', () => {
     localStorage.removeItem('oak_config');
-    showToast('Config 
+    showToast('Config
