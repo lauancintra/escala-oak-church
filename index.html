@@ -6,24 +6,6 @@
 <title>OAK Escala — Carvalhos da Justiça</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-<!-- Firebase v8 compat — carrega síncrono, sem módulos -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script>
-  // Inicializa Firebase imediatamente após os scripts carregarem
-  var firebaseConfig = {
-    apiKey: "AIzaSyDEuez90toWBDsYegerihaJmvXvDrdTZQQ",
-    authDomain: "escala-comunicacao-oak.firebaseapp.com",
-    projectId: "escala-comunicacao-oak",
-    storageBucket: "escala-comunicacao-oak.firebasestorage.app",
-    messagingSenderId: "495672494020",
-    appId: "1:495672494020:web:f4d0545721515a267b0691"
-  };
-  if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-  window._db = firebase.firestore();
-  window._firebaseReady = true;
-</script>
-
 <style>
 /* ════════════════════════════════════════════════
    PALETA OAK CHURCH — Preto · Branco · Verde Oliva
@@ -960,6 +942,31 @@ select option { background: var(--grey-dark); }
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- Firebase — carregamento dinâmico garante ordem correta -->
+<script>
+function loadScript(src, cb) {
+  var s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+loadScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js', function() {
+  loadScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js', function() {
+    var firebaseConfig = {
+      apiKey: "AIzaSyDEuez90toWBDsYegerihaJmvXvDrdTZQQ",
+      authDomain: "escala-comunicacao-oak.firebaseapp.com",
+      projectId: "escala-comunicacao-oak",
+      storageBucket: "escala-comunicacao-oak.firebasestorage.app",
+      messagingSenderId: "495672494020",
+      appId: "1:495672494020:web:f4d0545721515a267b0691"
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    window._db = firebase.firestore();
+    window._firebaseReady = true;
+  });
+});
+</script>
 
 <script>
 // ════════════════════════════════════════════════════════
