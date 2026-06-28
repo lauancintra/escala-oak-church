@@ -6,11 +6,11 @@
 <title>OAK Escala — Carvalhos da Justiça</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-<!-- Firebase SDK (compat — funciona em GitHub Pages) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<!-- Firebase SDK v8 — mais estável em CDN estático -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script>
-  const firebaseConfig = {
+  var firebaseConfig = {
     apiKey: "AIzaSyDEuez90toWBDsYegerihaJmvXvDrdTZQQ",
     authDomain: "escala-comunicacao-oak.firebaseapp.com",
     projectId: "escala-comunicacao-oak",
@@ -18,19 +18,9 @@
     messagingSenderId: "495672494020",
     appId: "1:495672494020:web:f4d0545721515a267b0691"
   };
-  try {
-    firebase.initializeApp(firebaseConfig);
-    window._db = firebase.firestore();
-    window._firebaseReady = true;
-    window._fbCompat = true;
-    // Usa window.load para garantir que todo o JS da página já executou
-    window.addEventListener('load', () => {
-      setTimeout(() => document.dispatchEvent(new Event('firebaseReady')), 500);
-    });
-  } catch(e) {
-    console.error('Firebase init error:', e);
-    window._firebaseReady = false;
-  }
+  firebase.initializeApp(firebaseConfig);
+  window._db = firebase.firestore();
+  window._firebaseReady = true;
 </script>
 
 <style>
@@ -1547,4 +1537,4 @@ async function changeCtrlPw() {
 function confirmClear() {
   openModal('Resetar Config Local', 'Isso apaga a chave da API salva neste navegador.', () => {
     localStorage.removeItem('oak_config');
-    showToast('Config 
+    showToast('Config
