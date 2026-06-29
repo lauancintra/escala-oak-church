@@ -326,10 +326,12 @@ select option { background: var(--grey-dark); }
 .cal-day.cal-sunday {
   background: var(--black-soft); color: var(--off-white);
   border-color: var(--grey-border); cursor: pointer;
+  pointer-events: all;
 }
 .cal-day.cal-wednesday {
   background: var(--black-soft); color: var(--off-white);
   border-color: var(--grey-border); cursor: pointer;
+  pointer-events: all;
 }
 .cal-day.cal-sunday:hover:not(.cal-past),
 .cal-day.cal-wednesday:hover:not(.cal-past) {
@@ -1274,7 +1276,7 @@ function renderCalendar() {
       else if (indisp === 'noite') indispLabel = '<span class="day-indisp-indicator">noite</span>';
       else if (indisp === 'full') indispLabel = '<span class="day-indisp-indicator">todo</span>';
 
-      const onclick = (!isPast && isCulto) ? `onclick="onDayClick(event,${day},${isSun},${isWed})"` : '';
+      const onclick = (!isPast && isCulto) ? `onclick="onDayClick(event,${day},${isSun?1:0},${isWed?1:0})"` : '';
 
       html += `<td class="${cls}" ${onclick}>
         <span class="day-num">${day}</span>
@@ -1298,6 +1300,8 @@ function changeCalMonth(dir) {
 
 // ── Click no dia ──
 function onDayClick(event, day, isSun, isWed) {
+  isSun = isSun == 1 || isSun === true;
+  isWed = isWed == 1 || isWed === true;
   if (isSun) {
     // Domingo → popup de período
     pendingDayClick = { day };
