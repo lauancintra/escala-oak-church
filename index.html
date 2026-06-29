@@ -848,11 +848,13 @@ select option { background: var(--grey-dark); }
           <label>Observações especiais (opcional)</label>
           <input type="text" id="genObs" placeholder="Ex: Não haverá culto na quarta dia 25...">
         </div>
-        <button class="btn btn-white" onclick="gerarEscala()" id="btnGerar">
-          ✨ Gerar Escala com IA
-        </button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-white" onclick="exportarDados()" id="btnExportar">
+            📋 Exportar dados para gerar escala
+          </button>
+        </div>
       </div>
-      <div id="scheduleOutput"></div>
+      <div id="exportOutput"></div>
     </div>
 
     <!-- CTAB CONFIG -->
@@ -1749,6 +1751,119 @@ function openModal(title, msg, onConfirm) {
 
 function closeModal() {
   document.getElementById('modalBg').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORTAR DADOS
+// ════════════════════════════════════════════════════════
+async function exportarDados() {
+  if (!firebaseOk) { showToast('Firebase não conectado', 'error'); return; }
+
+  const btn = document.getElementById('btnExportar');
+  btn.disabled = true;
+  btn.textContent = 'Carregando...';
+
+  try {
+    const mes = parseInt(document.getElementById('genMes').value);
+    const ano = parseInt(document.getElementById('genAno').value);
+    const obs = document.getElementById('genObs').value.trim();
+    const mesKey = `${ano}-${String(mes).padStart(2,'0')}`;
+    const pad = n => String(n).padStart(2,'0');
+
+    // Calcular datas do mês
+    const quartas = [], domingos = [];
+    const daysInMonth = new Date(ano, mes, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dow = new Date(ano, mes - 1, d).getDay();
+      if (dow === 0) domingos.push(d);
+      if (dow === 3) quartas.push(d);
+    }
+
+    const vols = await fbGetAll('voluntarios');
+    vols.sort((a, b) => a.nome.localeCompare(b.nome));
+
+    const MONTH_NAMES_PT = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                            'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+    let texto = `ESCALA ${MONTH_NAMES_PT[mes].toUpperCase()} ${ano} — OAK CHURCH FRANCA\n`;
+    texto += `${'='.repeat(55)}\n\n`;
+
+    texto += `CULTOS DO MÊS:\n`;
+    texto += `• Quartas: ${quartas.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+    texto += `• Domingos: ${domingos.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+    if (obs) texto += `• Observações: ${obs}\n`;
+    texto += `\n`;
+
+    texto += `REGRAS DOS CULTOS:\n`;
+    texto += `• Quarta: PTZ 1, Corte (Live), Projetor, Iluminação\n`;
+    texto += `• Domingo manhã: Projetor e Iluminação apenas\n`;
+    texto += `• Domingo noite: PTZ 1, PTZ 2, Câmera Móvel, Corte (Live), Mix Live (Mesa), Projetor, Iluminação, Fotografia, Stories, Interação\n`;
+    texto += `\n`;
+
+    texto += `EQUIPE E INDISPONIBILIDADES:\n`;
+    texto += `${'─'.repeat(55)}\n`;
+
+    for (const v of vols) {
+      const indisp = v.indisponibilidade?.[mesKey] || {};
+      const qBlock = quartas.filter(q => indisp[q] === 'full');
+      const dManhaBlock = domingos.filter(d => ['full','manha'].includes(indisp[d]));
+      const dNoiteBlock = domingos.filter(d => ['full','noite'].includes(indisp[d]));
+
+      texto += `\n${v.nome}\n`;
+      texto += `  Funções: ${(v.funcoes || []).join(', ') || 'nenhuma'}\n`;
+
+      if (qBlock.length === 0 && dManhaBlock.length === 0 && dNoiteBlock.length === 0) {
+        texto += `  Disponível em todos os cultos do mês\n`;
+      } else {
+        if (qBlock.length) texto += `  Quartas indisponível: ${qBlock.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+        if (dManhaBlock.length) texto += `  Dom. manhã indisponível: ${dManhaBlock.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+        if (dNoiteBlock.length) texto += `  Dom. noite indisponível: ${dNoiteBlock.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+      }
+    }
+
+    texto += `\n${'='.repeat(55)}\n`;
+    texto += `Cole esse texto no Claude e peça para gerar a escala do mês.\n`;
+
+    // Mostrar na tela
+    const out = document.getElementById('exportOutput');
+    out.innerHTML = `
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-size:12px;color:var(--grey-muted);text-transform:uppercase;letter-spacing:1px">
+            Dados de ${MONTH_NAMES_PT[mes]} ${ano} — ${vols.length} voluntários
+          </span>
+          <button class="btn btn-primary btn-sm" onclick="copiarExport()">📋 Copiar tudo</button>
+        </div>
+        <textarea id="exportText" readonly
+          style="width:100%;height:420px;background:var(--grey-dark);border:1px solid var(--grey-border);
+          border-radius:var(--radius);padding:16px;font-family:monospace;font-size:12px;
+          color:var(--off-white);line-height:1.6;resize:vertical;outline:none"
+        >${texto}</textarea>
+        <div style="margin-top:12px;padding:14px 18px;background:var(--olive-bg);border:1px solid var(--olive);
+          border-radius:var(--radius);font-size:13px;color:var(--olive-pale);line-height:1.6">
+          ✅ Copie o texto acima e cole no Claude com a mensagem:<br>
+          <strong style="color:var(--olive-light)">"Gere a escala de ${MONTH_NAMES_PT[mes]} com base nesses dados"</strong>
+        </div>
+      </div>`;
+
+  } catch(e) {
+    showToast('Erro ao exportar: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📋 Exportar dados para gerar escala';
+  }
+}
+
+function copiarExport() {
+  const el = document.getElementById('exportText');
+  if (!el) return;
+  navigator.clipboard.writeText(el.value)
+    .then(() => showToast('Dados copiados! Cole no Claude para gerar a escala.', 'success'))
+    .catch(() => {
+      el.select();
+      document.execCommand('copy');
+      showToast('Copiado!', 'success');
+    });
 }
 
 // ── INICIAR ──
