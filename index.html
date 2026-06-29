@@ -1030,20 +1030,28 @@ async function fbDelete(path) {
 
 // ── Firebase ready — polling simples ──
 async function waitForFirebase() {
-  if (window._firebaseReady && window._db) {
-    firebaseOk = true;
+  const conectar = async () => {
+    firebaseOk = true;           // seta ANTES de qualquer outra coisa
     setDbStatus('ok', 'conectado');
-    try { await initDefaultData(); } catch(e) { console.warn('initDefaultData:', e); }
+    try {
+      await initDefaultData();
+    } catch(e) {
+      console.warn('initDefaultData erro (não crítico):', e.message);
+      // Firebase conectado mesmo que seed falhe
+    }
+  };
+
+  if (window._firebaseReady && window._db) {
+    await conectar();
     return;
   }
+
   let attempts = 0;
   const interval = setInterval(async () => {
     attempts++;
     if (window._firebaseReady && window._db) {
       clearInterval(interval);
-      firebaseOk = true;
-      setDbStatus('ok', 'conectado');
-      try { await initDefaultData(); } catch(e) { console.warn('initDefaultData:', e); }
+      await conectar();
     } else if (attempts >= 60) {
       clearInterval(interval);
       setDbStatus('err', 'sem conexão');
@@ -1052,10 +1060,12 @@ async function waitForFirebase() {
 }
 
 function setDbStatus(state, label) {
-  const dot = document.getElementById('dbDot');
-  const lbl = document.getElementById('dbLabel');
-  dot.className = `db-dot ${state}`;
-  lbl.textContent = label;
+  try {
+    const dot = document.getElementById('dbDot');
+    const lbl = document.getElementById('dbLabel');
+    if (dot) dot.className = `db-dot ${state}`;
+    if (lbl) lbl.textContent = label;
+  } catch(e) {}
 }
 
 // ════════════════════════════════════════════════════════
@@ -1099,7 +1109,7 @@ async function initDefaultData() {
       }
       // Seed config
       await fbSet('config/app', { senha_ctrl: 'oak2026', seed: true });
-      showToast('Dados iniciais carregados!', 'success');
+      console.log('Dados iniciais carregados com sucesso');
     }
     // Popular select de login
     await popularSelectVols();
