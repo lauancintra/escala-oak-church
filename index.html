@@ -1300,6 +1300,7 @@ function changeCalMonth(dir) {
 
 // ── Click no dia ──
 function onDayClick(event, day, isSun, isWed) {
+  event.stopPropagation(); // impede que o clique feche o popup imediatamente
   isSun = isSun == 1 || isSun === true;
   isWed = isWed == 1 || isWed === true;
   if (isSun) {
