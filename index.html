@@ -845,6 +845,17 @@ select option { background: var(--grey-dark); }
           </div>
         </div>
         <div class="form-group">
+          <label>Haverá batismo neste mês?</label>
+          <select id="genBatismo">
+            <option value="nao">Não haverá batismo</option>
+            <option value="sim">Sim — haverá batismo</option>
+          </select>
+        </div>
+        <div class="form-group" id="genBatismoDiaWrap" style="display:none">
+          <label>Dia do batismo</label>
+          <input type="number" id="genBatismoDia" placeholder="Ex: 20" min="1" max="31">
+        </div>
+        <div class="form-group">
           <label>Observações especiais (opcional)</label>
           <input type="text" id="genObs" placeholder="Ex: Não haverá culto na quarta dia 25...">
         </div>
@@ -911,6 +922,14 @@ select option { background: var(--grey-dark); }
           <input type="text" id="addVolPw" placeholder="Ex: oak123">
         </div>
       </div>
+      <div class="form-group">
+        <label>Nível de conhecimento</label>
+        <select id="addVolNivel">
+          <option value="junior">Júnior — está aprendendo</option>
+          <option value="pleno">Pleno — já opera bem</option>
+          <option value="senior">Sênior — domina as ferramentas</option>
+        </select>
+      </div>
       <div style="margin-bottom:14px;font-size:11px;color:var(--grey-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600">Funções</div>
       <div class="funcoes-grid" id="addVolFuncoes"></div>
       <div style="margin-top:24px;display:flex;gap:10px">
@@ -928,6 +947,55 @@ select option { background: var(--grey-dark); }
   <div class="periodo-option" onclick="setPeriodo('noite')">🌙 Só à noite</div>
   <div class="periodo-option" onclick="setPeriodo('full')">🚫 Dia todo</div>
   <button class="periodo-clear" onclick="setPeriodo(null)">Remover marcação</button>
+</div>
+
+<!-- MODAL EDITAR VOLUNTÁRIO -->
+<div class="modal-bg" id="modalEditarBg" style="z-index:350">
+  <div class="modal" style="max-width:560px;width:100%">
+    <h3 id="modalEditarTitulo">Editar Voluntário</h3>
+    <p style="color:var(--grey-muted);font-size:13px;margin-bottom:20px">Atualize o nível e as funções deste voluntário.</p>
+
+    <div class="form-group">
+      <label>Nível de conhecimento</label>
+      <select id="editVolNivel">
+        <option value="junior">Júnior — está aprendendo</option>
+        <option value="pleno">Pleno — já opera bem</option>
+        <option value="senior">Sênior — domina as ferramentas</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:8px;font-size:11px;font-weight:600;color:var(--grey-muted);text-transform:uppercase;letter-spacing:1px">Funções</div>
+    <div class="funcoes-grid" id="editVolFuncoes" style="margin-bottom:24px"></div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline btn-sm" onclick="fecharModalEditar()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarEdicaoVol()">💾 Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACEITE INDISPONIBILIDADE -->
+<div class="modal-bg" id="modalAceiteBg" style="z-index:400">
+  <div class="modal" style="max-width:480px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:10px">📅</div>
+      <h3 style="font-family:var(--font-display);font-size:22px;letter-spacing:1.5px">ANTES DE COMEÇAR</h3>
+    </div>
+    <p style="font-size:14px;color:var(--off-white);line-height:1.8;margin-bottom:8px">
+      Nesta área você informa os dias em que <strong>não poderá ser escalado</strong> no próximo mês.
+    </p>
+    <p style="font-size:13px;color:var(--grey-muted);line-height:1.7;margin-bottom:20px">
+      Isso <strong style="color:var(--olive-light)">não é confirmação de presença</strong> — é o contrário: 
+      marque apenas os dias em que você tem uma impossibilidade real de servir.<br><br>
+      Quanto mais completo você preencher, mais justa será a escala para toda a equipe. 🙏
+    </p>
+    <div style="background:var(--olive-bg);border:1px solid var(--olive);border-radius:var(--radius);padding:12px 16px;margin-bottom:24px;font-size:13px;color:var(--olive-pale)">
+      "E tudo quanto fizerdes, fazei-o de todo o coração, como para o Senhor e não para os homens." — Cl 3:23
+    </div>
+    <button class="btn btn-primary btn-full" onclick="fecharAceite()">
+      Entendi, vou preencher minha disponibilidade ✓
+    </button>
+  </div>
 </div>
 
 <!-- MODAL -->
@@ -1074,30 +1142,30 @@ function setDbStatus(state, label) {
 // INIT — Seed voluntários padrão se Firebase vazio
 // ════════════════════════════════════════════════════════
 const DEFAULT_VOLS = [
-  { nome:'LAUAN',            funcoes:['PTZ 1','PTZ 2','Corte (Live)','Stories'],               senha:'oak2026' },
-  { nome:'SARA',             funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Corte (Live)','Projetor','Iluminação','Fotografia'], senha:'oak2026' },
-  { nome:'ALISON MATOS',     funcoes:['PTZ 1','PTZ 2','Corte (Live)','Interação'],             senha:'oak2026' },
-  { nome:'ALISON PILOTO',    funcoes:['Mix Live (Mesa)'],                                       senha:'oak2026' },
-  { nome:'ANTONIO',          funcoes:['PTZ 1','PTZ 2','Corte (Live)','Mix Live (Mesa)','Projetor','Iluminação','Interação'], senha:'oak2026' },
-  { nome:'DANIEL',           funcoes:['PTZ 1','PTZ 2','Corte (Live)','Projetor','Iluminação'], senha:'oak2026' },
-  { nome:'DUDA PORTELA',     funcoes:['Projetor','Iluminação'],                                 senha:'oak2026' },
-  { nome:'FERNANDO',         funcoes:['PTZ 1','PTZ 2','Corte (Live)','Projetor','Iluminação'], senha:'oak2026' },
-  { nome:'GUILHERME',        funcoes:['PTZ 1','PTZ 2','Câmera Móvel'],                         senha:'oak2026' },
-  { nome:'ICARO',            funcoes:['Mix Live (Mesa)','Iluminação'],                          senha:'oak2026' },
-  { nome:'JOAO PEDRO',       funcoes:['Iluminação'],                                            senha:'oak2026' },
-  { nome:'JULIA',            funcoes:['Stories'],                                               senha:'oak2026' },
-  { nome:'LAIRA LAMARCA',    funcoes:['Projetor','Iluminação'],                                 senha:'oak2026' },
-  { nome:'LUAN CRUZ',        funcoes:['Corte (Live)'],                                          senha:'oak2026' },
-  { nome:'MARIA LAURA',      funcoes:['Câmera Móvel','Projetor','Fotografia'],                  senha:'oak2026' },
-  { nome:'MARINA',           funcoes:['Stories'],                                               senha:'oak2026' },
-  { nome:'MAYSA',            funcoes:['Câmera Móvel','Projetor','Iluminação','Fotografia'],     senha:'oak2026' },
-  { nome:'MIGUEL',           funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Projetor','Iluminação'], senha:'oak2026' },
-  { nome:'NICOLLAS',         funcoes:['Projetor','Iluminação'],                                 senha:'oak2026' },
-  { nome:'SAMUEL',           funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Projetor','Iluminação'], senha:'oak2026' },
-  { nome:'SIMONE',           funcoes:['Fotografia'],                                            senha:'oak2026' },
-  { nome:'ANTONELA',         funcoes:['PTZ 1','PTZ 2'],                                         senha:'oak2026' },
-  { nome:'ANNA JULIA',       funcoes:['Stories'],                                               senha:'oak2026' },
-  { nome:'VICTOR',           funcoes:['PTZ 1','PTZ 2','Projetor','Iluminação'],                 senha:'oak2026' },
+  { nome:'LAUAN',            funcoes:['PTZ 1','PTZ 2','Corte (Live)','Stories'],               senha:'oak2026', nivel:'pleno' },
+  { nome:'SARA',             funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Corte (Live)','Projetor','Iluminação','Fotografia'], senha:'oak2026', nivel:'senior' },
+  { nome:'ALISON MATOS',     funcoes:['PTZ 1','PTZ 2','Corte (Live)','Interação'],             senha:'oak2026', nivel:'pleno' },
+  { nome:'ALISON PILOTO',    funcoes:['Mix Live (Mesa)'],                                       senha:'oak2026', nivel:'senior' },
+  { nome:'ANTONIO',          funcoes:['PTZ 1','PTZ 2','Corte (Live)','Mix Live (Mesa)','Projetor','Iluminação','Interação'], senha:'oak2026', nivel:'senior' },
+  { nome:'DANIEL',           funcoes:['PTZ 1','PTZ 2','Corte (Live)','Projetor','Iluminação'], senha:'oak2026', nivel:'pleno' },
+  { nome:'DUDA PORTELA',     funcoes:['Projetor','Iluminação'],                                 senha:'oak2026', nivel:'junior' },
+  { nome:'FERNANDO',         funcoes:['PTZ 1','PTZ 2','Corte (Live)','Projetor','Iluminação'], senha:'oak2026', nivel:'pleno' },
+  { nome:'GUILHERME',        funcoes:['PTZ 1','PTZ 2','Câmera Móvel'],                         senha:'oak2026', nivel:'junior' },
+  { nome:'ICARO',            funcoes:['Mix Live (Mesa)','Iluminação'],                          senha:'oak2026', nivel:'pleno' },
+  { nome:'JOAO PEDRO',       funcoes:['Iluminação'],                                            senha:'oak2026', nivel:'junior' },
+  { nome:'JULIA',            funcoes:['Stories'],                                               senha:'oak2026', nivel:'junior' },
+  { nome:'LAIRA LAMARCA',    funcoes:['Projetor','Iluminação'],                                 senha:'oak2026', nivel:'junior' },
+  { nome:'LUAN CRUZ',        funcoes:['Corte (Live)'],                                          senha:'oak2026', nivel:'pleno' },
+  { nome:'MARIA LAURA',      funcoes:['Câmera Móvel','Projetor','Fotografia'],                  senha:'oak2026', nivel:'junior' },
+  { nome:'MARINA',           funcoes:['Stories'],                                               senha:'oak2026', nivel:'junior' },
+  { nome:'MAYSA',            funcoes:['Câmera Móvel','Projetor','Iluminação','Fotografia'],     senha:'oak2026', nivel:'junior' },
+  { nome:'MIGUEL',           funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Projetor','Iluminação'], senha:'oak2026', nivel:'pleno' },
+  { nome:'NICOLLAS',         funcoes:['Projetor','Iluminação'],                                 senha:'oak2026', nivel:'junior' },
+  { nome:'SAMUEL',           funcoes:['PTZ 1','PTZ 2','Câmera Móvel','Projetor','Iluminação'], senha:'oak2026', nivel:'pleno' },
+  { nome:'SIMONE',           funcoes:['Fotografia'],                                            senha:'oak2026', nivel:'junior' },
+  { nome:'ANTONELA',         funcoes:['PTZ 1','PTZ 2'],                                         senha:'oak2026', nivel:'junior' },
+  { nome:'ANNA JULIA',       funcoes:['Stories'],                                               senha:'oak2026', nivel:'junior' },
+  { nome:'VICTOR',           funcoes:['PTZ 1','PTZ 2','Projetor','Iluminação'],                 senha:'oak2026', nivel:'pleno' },
 ];
 
 async function initDefaultData() {
@@ -1107,7 +1175,7 @@ async function initDefaultData() {
       // Seed voluntários
       for (const v of DEFAULT_VOLS) {
         const id = v.nome.replace(/\s+/g,'_').toLowerCase();
-        await fbSet(`voluntarios/${id}`, { nome: v.nome, funcoes: v.funcoes, senha: v.senha, indisponibilidade: {} });
+        await fbSet(`voluntarios/${id}`, { nome: v.nome, funcoes: v.funcoes, senha: v.senha, nivel: v.nivel || 'junior', indisponibilidade: {} });
       }
       // Seed config
       await fbSet('config/app', { senha_ctrl: 'oak2026', seed: true });
@@ -1194,6 +1262,9 @@ async function doVolLogin() {
     currentVol = { id: volId, ...data };
     showScreen('screen-vol-panel');
     renderVolPanel();
+    // Mostrar modal de aceite sempre que logar
+    const aceiteModal = document.getElementById('modalAceiteBg');
+    if (aceiteModal) aceiteModal.classList.add('open');
   } catch(e) {
     showToast('Erro ao conectar: ' + e.message, 'error');
   }
@@ -1210,7 +1281,7 @@ function renderVolPanel() {
       <div class="vol-avatar">${initials}</div>
       <div>
         <div class="vph-name">${v.nome}</div>
-        <div class="vph-sub">${(v.funcoes||[]).length} função(ões) · Atualize suas informações abaixo</div>
+        <div class="vph-sub">${(v.funcoes||[]).length} função(ões) · Nível: <strong style="color:var(--olive-light)">${(v.nivel||'junior').charAt(0).toUpperCase()+(v.nivel||'junior').slice(1)}</strong></div>
       </div>
     </div>`;
 
@@ -1463,10 +1534,18 @@ async function renderCtrlPanel() {
         .reduce((acc, m) => acc + Object.keys(m).length, 0);
       return `
       <div class="vol-card">
-        <div class="vol-card-name">${v.nome}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="vol-card-name">${v.nome}</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.5px;
+            background:${v.nivel==='senior'?'rgba(201,168,76,0.2)':v.nivel==='pleno'?'rgba(90,110,58,0.3)':'rgba(255,255,255,0.08)'};
+            color:${v.nivel==='senior'?'#e8bb5a':v.nivel==='pleno'?'#8aaa5c':'#888'}">
+            ${(v.nivel||'junior').toUpperCase()}
+          </span>
+        </div>
         <div class="vol-card-funcs">${(v.funcoes||[]).join(', ') || 'Sem funções'}</div>
         ${totalIndisp ? `<div class="vol-card-indisp">⚠ ${totalIndisp} dia(s) indisponível</div>` : ''}
         <div class="vol-card-actions">
+          <button class="btn btn-outline btn-xs" onclick="ctrlEditarVol('${v.id}')">✏️ Editar</button>
           <button class="btn btn-outline btn-xs" onclick="ctrlResetPw('${v.id}','${v.nome}')">🔑 Senha</button>
           <button class="btn btn-danger btn-xs" onclick="ctrlRemoveVol('${v.id}','${v.nome}')">✕</button>
         </div>
@@ -1526,11 +1605,12 @@ async function saveNewVol() {
   const funcoes = Array.from(document.querySelectorAll('#addVolFuncoes .func-check.checked span'))
     .map(el => el.textContent);
 
+  const nivel = document.getElementById('addVolNivel').value;
   const id = nome.replace(/\s+/g,'_').toLowerCase();
   try {
     const exists = await fbGet(`voluntarios/${id}`);
     if (exists) { showToast('Voluntário já existe', 'error'); return; }
-    await fbSet(`voluntarios/${id}`, { nome, funcoes, senha, indisponibilidade: {} });
+    await fbSet(`voluntarios/${id}`, { nome, funcoes, senha, nivel, indisponibilidade: {} });
     showToast(`${nome} cadastrado!`, 'success');
     showCtrlPanel();
   } catch(e) {
@@ -1767,8 +1847,13 @@ async function exportarDados() {
     const mes = parseInt(document.getElementById('genMes').value);
     const ano = parseInt(document.getElementById('genAno').value);
     const obs = document.getElementById('genObs').value.trim();
+    const temBatismo = document.getElementById('genBatismo').value === 'sim';
+    const diaBatismo = temBatismo ? parseInt(document.getElementById('genBatismoDia').value) : null;
     const mesKey = `${ano}-${String(mes).padStart(2,'0')}`;
     const pad = n => String(n).padStart(2,'0');
+
+    const MONTH_NAMES_PT = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                            'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
     // Calcular datas do mês
     const quartas = [], domingos = [];
@@ -1779,18 +1864,45 @@ async function exportarDados() {
       if (dow === 3) quartas.push(d);
     }
 
+    // 2º domingo = Santa Ceia
+    const santaCeia = domingos[1] || null;
+
     const vols = await fbGetAll('voluntarios');
     vols.sort((a, b) => a.nome.localeCompare(b.nome));
 
-    const MONTH_NAMES_PT = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-                            'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    // Versículos motivacionais (rotação pelo mês)
+    const versiculos = [
+      '"E tudo quanto fizerdes, fazei-o de todo o coração, como para o Senhor." — Cl 3:23',
+      '"Cada um administre aos outros o dom que recebeu, como bons despenseiros da multiforme graça de Deus." — 1Pe 4:10',
+      '"Porque somos cooperadores de Deus." — 1Co 3:9',
+      '"O dom do homem abre-lhe caminho e o introduz perante os grandes." — Pv 18:16',
+      '"Tudo posso naquele que me fortalece." — Fp 4:13',
+      '"Sede imitadores de mim, como também eu sou de Cristo." — 1Co 11:1',
+      '"Que a luz de vocês brilhe diante dos homens." — Mt 5:16',
+      '"Sirva cada um com o dom que recebeu." — 1Pe 4:10',
+      '"Não nos cansemos de fazer o bem." — Gl 6:9',
+      '"O Senhor está contigo, homem valente." — Jz 6:12',
+      '"O coração alegre é como bom remédio." — Pv 17:22',
+      '"Edificai uns aos outros." — 1Ts 5:11',
+    ];
+    const versiculo = versiculos[(mes - 1) % versiculos.length];
 
     let texto = `ESCALA ${MONTH_NAMES_PT[mes].toUpperCase()} ${ano} — OAK CHURCH FRANCA\n`;
-    texto += `${'='.repeat(55)}\n\n`;
+    texto += `${'='.repeat(60)}\n\n`;
+
+    texto += `VERSÍCULO DO MÊS:\n`;
+    texto += `${versiculo}\n\n`;
 
     texto += `CULTOS DO MÊS:\n`;
     texto += `• Quartas: ${quartas.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
     texto += `• Domingos: ${domingos.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+
+    if (santaCeia) {
+      texto += `• ✝ SANTA CEIA: ${pad(santaCeia)}/${pad(mes)} (2º domingo) — priorizar voluntários SÊNIOR e PLENO\n`;
+    }
+    if (temBatismo && diaBatismo) {
+      texto += `• 🕊 BATISMO: ${pad(diaBatismo)}/${pad(mes)} — priorizar voluntários SÊNIOR e PLENO\n`;
+    }
     if (obs) texto += `• Observações: ${obs}\n`;
     texto += `\n`;
 
@@ -1800,48 +1912,60 @@ async function exportarDados() {
     texto += `• Domingo noite: PTZ 1, PTZ 2, Câmera Móvel, Corte (Live), Mix Live (Mesa), Projetor, Iluminação, Fotografia, Stories, Interação\n`;
     texto += `\n`;
 
+    texto += `NÍVEIS:\n`;
+    texto += `• SÊNIOR: domina todas as ferramentas — prioridade em datas especiais\n`;
+    texto += `• PLENO: opera bem — pode ser escalado em qualquer culto\n`;
+    texto += `• JÚNIOR: está aprendendo — evitar datas especiais, balancear carga\n\n`;
+
     texto += `EQUIPE E INDISPONIBILIDADES:\n`;
-    texto += `${'─'.repeat(55)}\n`;
+    texto += `${'─'.repeat(60)}\n`;
 
     for (const v of vols) {
       const indisp = v.indisponibilidade?.[mesKey] || {};
       const qBlock = quartas.filter(q => indisp[q] === 'full');
       const dManhaBlock = domingos.filter(d => ['full','manha'].includes(indisp[d]));
       const dNoiteBlock = domingos.filter(d => ['full','noite'].includes(indisp[d]));
+      const nivel = (v.nivel || 'junior').toUpperCase();
 
-      texto += `\n${v.nome}\n`;
+      texto += `\n${v.nome} [${nivel}]\n`;
       texto += `  Funções: ${(v.funcoes || []).join(', ') || 'nenhuma'}\n`;
 
-      if (qBlock.length === 0 && dManhaBlock.length === 0 && dNoiteBlock.length === 0) {
-        texto += `  Disponível em todos os cultos do mês\n`;
+      if (!qBlock.length && !dManhaBlock.length && !dNoiteBlock.length) {
+        texto += `  Disponível em todos os cultos\n`;
       } else {
-        if (qBlock.length) texto += `  Quartas indisponível: ${qBlock.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
-        if (dManhaBlock.length) texto += `  Dom. manhã indisponível: ${dManhaBlock.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
-        if (dNoiteBlock.length) texto += `  Dom. noite indisponível: ${dNoiteBlock.map(d => `${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+        if (qBlock.length) texto += `  Quartas indisponível: ${qBlock.map(d=>`${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+        if (dManhaBlock.length) texto += `  Dom. manhã indisponível: ${dManhaBlock.map(d=>`${pad(d)}/${pad(mes)}`).join(', ')}\n`;
+        if (dNoiteBlock.length) texto += `  Dom. noite indisponível: ${dNoiteBlock.map(d=>`${pad(d)}/${pad(mes)}`).join(', ')}\n`;
       }
     }
 
-    texto += `\n${'='.repeat(55)}\n`;
-    texto += `Cole esse texto no Claude e peça para gerar a escala do mês.\n`;
+    texto += `\n${'='.repeat(60)}\n`;
+    texto += `INSTRUÇÕES PARA O CLAUDE:\n`;
+    texto += `Gere a escala completa de ${MONTH_NAMES_PT[mes]} ${ano} respeitando todas as indisponibilidades.\n`;
+    if (santaCeia) texto += `Na Santa Ceia (${pad(santaCeia)}/${pad(mes)}) priorize voluntários SÊNIOR e PLENO.\n`;
+    if (temBatismo && diaBatismo) texto += `No Batismo (${pad(diaBatismo)}/${pad(mes)}) priorize voluntários SÊNIOR e PLENO.\n`;
+    texto += `Inclua o versículo "${versiculo}" no início da resposta como mensagem motivacional para a equipe.\n`;
 
     // Mostrar na tela
     const out = document.getElementById('exportOutput');
     out.innerHTML = `
       <div style="margin-top:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
           <span style="font-size:12px;color:var(--grey-muted);text-transform:uppercase;letter-spacing:1px">
-            Dados de ${MONTH_NAMES_PT[mes]} ${ano} — ${vols.length} voluntários
+            ${MONTH_NAMES_PT[mes]} ${ano} · ${vols.length} voluntários
+            ${santaCeia ? ` · ✝ Santa Ceia dia ${santaCeia}` : ''}
+            ${temBatismo && diaBatismo ? ` · 🕊 Batismo dia ${diaBatismo}` : ''}
           </span>
           <button class="btn btn-primary btn-sm" onclick="copiarExport()">📋 Copiar tudo</button>
         </div>
         <textarea id="exportText" readonly
-          style="width:100%;height:420px;background:var(--grey-dark);border:1px solid var(--grey-border);
+          style="width:100%;height:440px;background:var(--grey-dark);border:1px solid var(--grey-border);
           border-radius:var(--radius);padding:16px;font-family:monospace;font-size:12px;
           color:var(--off-white);line-height:1.6;resize:vertical;outline:none"
         >${texto}</textarea>
         <div style="margin-top:12px;padding:14px 18px;background:var(--olive-bg);border:1px solid var(--olive);
-          border-radius:var(--radius);font-size:13px;color:var(--olive-pale);line-height:1.6">
-          ✅ Copie o texto acima e cole no Claude com a mensagem:<br>
+          border-radius:var(--radius);font-size:13px;color:var(--olive-pale);line-height:1.7">
+          ✅ Copie o texto acima e cole aqui no Claude com a mensagem:<br>
           <strong style="color:var(--olive-light)">"Gere a escala de ${MONTH_NAMES_PT[mes]} com base nesses dados"</strong>
         </div>
       </div>`;
@@ -1864,6 +1988,87 @@ function copiarExport() {
       document.execCommand('copy');
       showToast('Copiado!', 'success');
     });
+}
+
+// ════════════════════════════════════════════════════════
+// EDITAR VOLUNTÁRIO (controlador)
+// ════════════════════════════════════════════════════════
+let editandoVolId = null;
+
+async function ctrlEditarVol(volId) {
+  try {
+    const data = await fbGet(`voluntarios/${volId}`);
+    if (!data) { showToast('Voluntário não encontrado', 'error'); return; }
+
+    editandoVolId = volId;
+
+    // Título do modal
+    document.getElementById('modalEditarTitulo').textContent = `Editar — ${data.nome}`;
+
+    // Preencher nível
+    const selNivel = document.getElementById('editVolNivel');
+    selNivel.value = data.nivel || 'junior';
+
+    // Preencher funções
+    const funcoes = data.funcoes || [];
+    const FUNCOES = [
+      'PTZ 1','PTZ 2','Câmera Móvel','Corte (Live)',
+      'Mix Live (Mesa)','Projetor','Iluminação',
+      'Fotografia','Stories','Interação'
+    ];
+    document.getElementById('editVolFuncoes').innerHTML = FUNCOES.map(f => {
+      const chk = funcoes.includes(f);
+      return `<label class="func-check ${chk ? 'checked' : ''}"
+        onclick="this.classList.toggle('checked');this.querySelector('input').checked=!this.querySelector('input').checked;event.preventDefault()">
+        <input type="checkbox" ${chk ? 'checked' : ''} style="pointer-events:none">
+        <span>${f}</span>
+      </label>`;
+    }).join('');
+
+    // Abrir modal
+    document.getElementById('modalEditarBg').classList.add('open');
+  } catch(e) {
+    showToast('Erro ao carregar: ' + e.message, 'error');
+  }
+}
+
+async function salvarEdicaoVol() {
+  if (!editandoVolId) return;
+  const nivel = document.getElementById('editVolNivel').value;
+  const funcoes = Array.from(
+    document.querySelectorAll('#editVolFuncoes .func-check.checked span')
+  ).map(el => el.textContent);
+
+  try {
+    await fbSet(`voluntarios/${editandoVolId}`, { nivel, funcoes });
+    fecharModalEditar();
+    showToast('Voluntário atualizado! ✅', 'success');
+    renderCtrlPanel(); // Atualiza os cards
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message, 'error');
+  }
+}
+
+function fecharModalEditar() {
+  document.getElementById('modalEditarBg').classList.remove('open');
+  editandoVolId = null;
+}
+
+// Toggle campo dia batismo
+document.addEventListener('DOMContentLoaded', () => {
+  const selBatismo = document.getElementById('genBatismo');
+  if (selBatismo) {
+    selBatismo.addEventListener('change', () => {
+      const wrap = document.getElementById('genBatismoDiaWrap');
+      if (wrap) wrap.style.display = selBatismo.value === 'sim' ? 'block' : 'none';
+    });
+  }
+});
+
+// Função fechar modal aceite
+function fecharAceite() {
+  const modal = document.getElementById('modalAceiteBg');
+  if (modal) modal.classList.remove('open');
 }
 
 // ── INICIAR ──
